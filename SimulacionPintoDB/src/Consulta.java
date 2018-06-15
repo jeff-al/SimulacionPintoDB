@@ -1,8 +1,11 @@
+
 public class Consulta {
-        
-    enum tipo {DDL, UPDATE, JOIN, SELECT}; 
+
+    enum TipoSentencia {
+        DDL, UPDATE, JOIN, SELECT
+    };
     int id;
-    tipo tipoSentencia;
+    TipoSentencia tipoSentencia;
     boolean soloLectura;
     int bloquesCargados;
     double tiempoLlegada;
