@@ -13,4 +13,8 @@ public class Evento {
     TipoModulo modulo;
     double tiempo;
     Consulta consulta;
+
+    Evento(Consulta consulta) {
+        this.consulta = consulta;
+    }
 }
