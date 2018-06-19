@@ -11,9 +11,18 @@ public class Consulta {
     double tiempoLlegada;
     double tiempoSalida;
     double tiempoEnsistema;
+
     EstadisticasConsulta estadistAdm_Conexiones;
     EstadisticasConsulta estadistAdm_Procesos;
     EstadisticasConsulta estadistProc_Consultas;
     EstadisticasConsulta estadistTransacciones;
     EstadisticasConsulta estadistEjec_Sentencias;
+
+    Consulta() {
+        estadistAdm_Conexiones = new EstadisticasConsulta();
+        estadistAdm_Procesos = new EstadisticasConsulta();
+        estadistProc_Consultas = new EstadisticasConsulta();
+        estadistTransacciones = new EstadisticasConsulta();
+        estadistEjec_Sentencias = new EstadisticasConsulta();
+    }
 }

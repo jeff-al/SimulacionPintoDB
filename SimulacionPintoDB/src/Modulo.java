@@ -4,7 +4,7 @@ import java.util.Queue;
 
 public abstract class Modulo {
 
-    GenValoresAleatorios generador;
+    GenValoresAleatorios generador = new GenValoresAleatorios();
     int numMaxServidores = 0;
     int numServOcupados = 0;
     Queue<Consulta> colaC = new LinkedList();
@@ -18,6 +18,6 @@ public abstract class Modulo {
     }
 
     void procesarRetiro(Simulacion s, Evento e) {
-
+        
     }
 }

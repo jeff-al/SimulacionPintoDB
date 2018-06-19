@@ -1,8 +1,8 @@
 
 public class AdministracionProcesos extends Modulo {
 
-    double mediaHilo;
-    double varianzaHilo;
+    double mediaHilo = 1;
+    double varianzaHilo = 0.01;
 
     AdministracionProcesos() {
         numMaxServidores = 1;
@@ -25,6 +25,7 @@ public class AdministracionProcesos extends Modulo {
             evento.tiempo = e.tiempo + tiempoHilo;
             s.listaE.add(evento);
             numServOcupados = 1;
+
         }
 
     }
@@ -46,19 +47,20 @@ public class AdministracionProcesos extends Modulo {
             evento.modulo = e.modulo.PROC_CONSULTAS;
             evento.tiempo = e.tiempo;
             numServOcupados = 0;
+            s.listaE.add(evento);
         }
-            if (!colaC.isEmpty()) {   //Si despues de una salida hay algo en cola
-                Consulta consulta = colaC.remove();
-                double tiempoHilo = generador.GenerarValNormal(varianzaHilo, mediaHilo);
-                consulta.estadistAdm_Procesos.tiempoSalidaCola = e.tiempo - consulta.estadistAdm_Procesos.tiempoLlegadaModulo;
-                consulta.estadistAdm_Procesos.tiempoSalidaModulo = tiempoHilo + e.tiempo;
-                consulta.estadistAdm_Procesos.tiempoEnModulo = (tiempoHilo + e.tiempo) - consulta.estadistAdm_Procesos.tiempoLlegadaModulo;
-                Evento eventoS = new Evento(consulta);
-                eventoS.tipoE = e.tipoE.SALIDA;
-                eventoS.modulo = e.modulo.ADM_PROCESOS;
-                eventoS.tiempo = e.tiempo + tiempoHilo;
-                s.listaE.add(eventoS);
-                numServOcupados = 1;
-            }
+        if (!colaC.isEmpty()) {   //Si despues de una salida hay algo en cola
+            Consulta consulta = colaC.remove();
+            double tiempoHilo = generador.GenerarValNormal(varianzaHilo, mediaHilo);
+            consulta.estadistAdm_Procesos.tiempoSalidaCola = e.tiempo - consulta.estadistAdm_Procesos.tiempoLlegadaModulo;
+            consulta.estadistAdm_Procesos.tiempoSalidaModulo = tiempoHilo + e.tiempo;
+            consulta.estadistAdm_Procesos.tiempoEnModulo = (tiempoHilo + e.tiempo) - consulta.estadistAdm_Procesos.tiempoLlegadaModulo;
+            Evento eventoS = new Evento(consulta);
+            eventoS.tipoE = e.tipoE.SALIDA;
+            eventoS.modulo = e.modulo.ADM_PROCESOS;
+            eventoS.tiempo = e.tiempo + tiempoHilo;
+            s.listaE.add(eventoS);
+            numServOcupados = 1;
         }
+    }
 }

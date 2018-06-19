@@ -8,14 +8,13 @@ package simulacionpintodb;
 /**
  *
  * @author b60380
- */
+ *//*
 public class SimulacionPintoDB {
+
+    Simulacion s = new Simulacion();
 
     /**
      * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
-    }
+     
 
-}
+}*/
