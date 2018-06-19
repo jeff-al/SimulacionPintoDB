@@ -14,12 +14,14 @@ public class Simulacion {
 
     int n; //ProcesosDisponibles
     int p; //MaximoConsultas
-    
-    Modulo moduloAC = new AdministracionConexiones();
+    int m; //MaximoSentencias
+    int c; //NumMaxConexiones
+
+    Modulo moduloAC = new AdministracionConexiones(c);
     Modulo moduloAP = new AdministracionProcesos();
     Modulo moduloPC = new ProcesamientoConsulta(n);
     Modulo moduloT = new Transacciones(p);
-    Modulo moduloES = new EjecucionDeSentencias();
+    Modulo moduloES = new EjecucionDeSentencias(m);
 
     private double reloj;
 
@@ -58,6 +60,7 @@ public class Simulacion {
         evento.modulo = evento.modulo.ADM_PROCESOS;
         evento.consulta = consulta;
         evento.tiempo = reloj;
+        evento.consulta.bloquesCargados = 0;
         listaE.add(evento);
         listaC.add(consulta);
     }

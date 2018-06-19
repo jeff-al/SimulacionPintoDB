@@ -47,9 +47,9 @@ public class ProcesamientoConsulta extends Modulo {
         if (!colaC.isEmpty()) {   //Si despues de una salida hay algo en cola
             Consulta consulta = colaC.remove();
             double tiempoProc = procesamiento(e.consulta);
-            consulta.estadistProc_Consultas.tiempoSalidaCola = e.tiempo - consulta.estadistAdm_Procesos.tiempoLlegadaModulo;
+            consulta.estadistProc_Consultas.tiempoSalidaCola = e.tiempo - consulta.estadistProc_Consultas.tiempoLlegadaModulo;
             consulta.estadistProc_Consultas.tiempoSalidaModulo = tiempoProc + e.tiempo;
-            consulta.estadistProc_Consultas.tiempoEnModulo = (tiempoProc + e.tiempo) - consulta.estadistAdm_Procesos.tiempoLlegadaModulo;
+            consulta.estadistProc_Consultas.tiempoEnModulo = (tiempoProc + e.tiempo) - consulta.estadistProc_Consultas.tiempoLlegadaModulo;
             Evento eventoS = new Evento(consulta);
             eventoS.tipoE = e.tipoE.SALIDA;
             eventoS.modulo = e.modulo.PROC_CONSULTAS;
