@@ -10,7 +10,7 @@ public class AdministracionProcesos extends Modulo {
     }
 
     @Override
-    void ProcesarEntrada(Simulacion s, Evento e) {
+    void procesarEntrada(Simulacion s, Evento e) {
         e.consulta.estadistAdm_Procesos.tiempoLlegadaModulo = e.tiempo;
         if (numServOcupados == numMaxServidores) { //Si ya hay una consulta siendo procesada
             colaC.add(e.consulta);
@@ -30,7 +30,7 @@ public class AdministracionProcesos extends Modulo {
     }
 
     @Override
-    void ProcesarSalida(Simulacion s, Evento e) {
+    void procesarSalida(Simulacion s, Evento e) {
         e.consulta.tiempoSalida = e.tiempo;
         if ((e.tiempo - e.consulta.tiempoLlegada) > s.tiempoMaximo) { //Si hace timeout
             e.consulta.tiempoEnsistema = e.tiempo - e.consulta.tiempoLlegada;
@@ -39,13 +39,14 @@ public class AdministracionProcesos extends Modulo {
             evento.tipoE = evento.tipoE.RETIRO;
             evento.modulo = evento.modulo.ADM_PROCESOS;
             evento.tiempo = e.tiempo;
+            numServOcupados = 0;
         } else {                                     //Si no hace timeout
             Evento evento = new Evento(e.consulta);
             evento.tipoE = e.tipoE.ENTRADA;
             evento.modulo = e.modulo.PROC_CONSULTAS;
             evento.tiempo = e.tiempo;
             numServOcupados = 0;
-
+        }
             if (!colaC.isEmpty()) {   //Si despues de una salida hay algo en cola
                 Consulta consulta = colaC.remove();
                 double tiempoHilo = generador.GenerarValNormal(varianzaHilo, mediaHilo);
@@ -56,9 +57,8 @@ public class AdministracionProcesos extends Modulo {
                 eventoS.tipoE = e.tipoE.SALIDA;
                 eventoS.modulo = e.modulo.ADM_PROCESOS;
                 eventoS.tiempo = e.tiempo + tiempoHilo;
-                s.listaE.add(evento);
+                s.listaE.add(eventoS);
                 numServOcupados = 1;
             }
         }
-    }
 }

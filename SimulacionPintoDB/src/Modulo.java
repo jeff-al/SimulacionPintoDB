@@ -5,19 +5,19 @@ import java.util.Queue;
 public abstract class Modulo {
 
     GenValoresAleatorios generador;
-    int numMaxServidores;
-    int numServOcupados;
+    int numMaxServidores = 0;
+    int numServOcupados = 0;
     Queue<Consulta> colaC = new LinkedList();
 
-    void ProcesarEntrada(Simulacion s, Evento e) {
+    void procesarEntrada(Simulacion s, Evento e) {
 
     }
 
-    void ProcesarSalida(Simulacion s, Evento e) {
+    void procesarSalida(Simulacion s, Evento e) {
 
     }
 
-    void ProcesarRetiro(Simulacion s, Evento e) {
+    void procesarRetiro(Simulacion s, Evento e) {
 
     }
 }

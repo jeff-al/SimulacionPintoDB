@@ -12,10 +12,13 @@ public class Simulacion {
     List<Consulta> listaC = new ArrayList();
     List<Evento> listaE = new ArrayList();
 
+    int n; //ProcesosDisponibles
+    int p; //MaximoConsultas
+    
     Modulo moduloAC = new AdministracionConexiones();
     Modulo moduloAP = new AdministracionProcesos();
-    Modulo moduloPC = new ProcesamientoConsulta();
-    Modulo moduloT = new Transacciones();
+    Modulo moduloPC = new ProcesamientoConsulta(n);
+    Modulo moduloT = new Transacciones(p);
     Modulo moduloES = new EjecucionDeSentencias();
 
     private double reloj;
