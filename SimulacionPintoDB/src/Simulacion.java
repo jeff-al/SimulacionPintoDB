@@ -9,8 +9,8 @@ public class Simulacion {
     List<Evento> listaE = new ArrayList();
 
     int n = 5; //ProcesosDisponibles
-    int p = 3; //MaximoConsultas
-    int m = 6; //MaximoSentencias
+    int p = 5; //MaximoConsultas
+    int m = 5; //MaximoSentencias
     int c = 7;
 
     Modulo moduloAC = new AdministracionConexiones(c);
@@ -20,6 +20,7 @@ public class Simulacion {
     Modulo moduloES = new EjecucionDeSentencias(m);
 
     GenValoresAleatorios generador = new GenValoresAleatorios();
+    EstadisticasTotales estadisticasT = new EstadisticasTotales();
 
     private double reloj = 0;
 
@@ -45,9 +46,9 @@ public class Simulacion {
                 case ADM_PROCESOS:
                     if (evento.tipoE == Evento.TipoEvento.ENTRADA) {
                         moduloAP.procesarEntrada(this, evento);
-                        //if(moduloAC.numMaxServidores != moduloAC.numServOcupados){
-                            crearEvento();
-                        //}
+                       //if(moduloAC.numMaxServidores != moduloAC.numServOcupados){
+                        crearEvento();
+                       //}
                     } else if (evento.tipoE == Evento.TipoEvento.SALIDA) {
                         moduloAP.procesarSalida(this, evento);
                     } else {
@@ -83,21 +84,19 @@ public class Simulacion {
                     break;
             }
         }
-        imprimir();
     }
 
     void crearEvento() {
         double random = Math.random();
-        System.out.println("random: "+random);
         Consulta consulta = new Consulta();
         consulta.id = ids++;
-        if (random < 30) {
+        if (random < 0.30) {
             consulta.tipoSentencia = consulta.tipoSentencia.SELECT;
             consulta.soloLectura = true;
-        } else if (random < 55) {
+        } else if (random < 0.55) {
             consulta.tipoSentencia = consulta.tipoSentencia.UPDATE;
             consulta.soloLectura = false;
-        } else if (random < 90) {
+        } else if (random < 0.90) {
             consulta.tipoSentencia = consulta.tipoSentencia.JOIN;
             consulta.soloLectura = true;
         } else {
@@ -105,14 +104,13 @@ public class Simulacion {
             consulta.soloLectura = false;
         }
         consulta.tiempoLlegada = reloj;
-        consulta.estadistAdm_Conexiones.tiempoLlegadaModulo = reloj;
+        consulta.estadistAdm_Conexiones.tiempoLlegadaModulo = reloj;  //Se puede eliminar todo
         consulta.estadistAdm_Conexiones.tiempoSalidaModulo = reloj;
         consulta.estadistAdm_Conexiones.tiempoSalidaCola = 0;
         consulta.estadistAdm_Conexiones.tiempoEnModulo = 0; // Asumiendo que dura algo en el modulo
         Evento evento = new Evento(consulta);
-        evento.tipoE = evento.tipoE.ENTRADA;
+        evento.tipoE = Evento.TipoEvento.ENTRADA;
         evento.modulo = evento.modulo.ADM_PROCESOS;
-        evento.consulta = consulta;
         if (inicial) {
             evento.tiempo = 0;
             inicial = false;
@@ -144,14 +142,15 @@ public class Simulacion {
     void imprimir() {
         for (int i = 0; i < listaC.size(); i++) {
 
-            System.out.print("Nombre significativo: " + listaC.get(i).id + " ");
-            System.out.print("bloquesCargados: " + listaC.get(i).bloquesCargados + " ");
-            System.out.print("tiempoLlegada: " + listaC.get(i).tiempoLlegada + " ");
-            System.out.print("tiempoSalida: " + listaC.get(i).tiempoSalida + " ");
-            System.out.print("tiempoSistema: " + listaC.get(i).tiempoEnsistema + "\n\n");
-
+            //  System.out.print("Nombre significativo: " + listaC.get(i).id + " ");
+            //  System.out.print("bloquesCargados: " + listaC.get(i).bloquesCargados + " ");
+            //  System.out.print("tiempoLlegada: " + listaC.get(i).tiempoLlegada + " ");
+            //  System.out.print("tiempoSalida: " + listaC.get(i).tiempoSalida + " ");
+            //  System.out.print("tiempoSistema: " + listaC.get(i).tiempoEnsistema + "\n\n");
         }
-
+        System.out.println("Cola AP: " + moduloAP.colaC.size());
+        System.out.println("Cola PC: " + moduloPC.colaC.size());
+        System.out.println("Cola ES: " + moduloES.colaC.size() + "\n\n");
     }
 
     public static void main(String[] args) {

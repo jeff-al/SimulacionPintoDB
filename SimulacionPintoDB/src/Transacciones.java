@@ -46,8 +46,6 @@ public class Transacciones extends Modulo {
         numMaxServidores = numConsultas;
     }
 
-    double tiempoTransaccion;
-    double duracionBloque;
     boolean espera = false;
     PriorityQueue<Consulta> PQ = new PriorityQueue(new PQsort());
 
@@ -136,7 +134,7 @@ public class Transacciones extends Modulo {
             espera = false;
         }
         if (!PQ.isEmpty()) {   //Si despues de una salida hay algo en cola
-            Consulta consulta = colaC.remove();
+            Consulta consulta = PQ.remove();
             if (consulta.tipoSentencia == Consulta.TipoSentencia.DDL) {
                 espera = true;
             }
