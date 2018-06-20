@@ -41,6 +41,7 @@ public class AdministracionProcesos extends Modulo {
             evento.modulo = evento.modulo.ADM_PROCESOS;
             evento.tiempo = e.tiempo;
             numServOcupados = 0;
+            s.moduloAC.numServOcupados--;
         } else {                                     //Si no hace timeout
             Evento evento = new Evento(e.consulta);
             evento.tipoE = e.tipoE.ENTRADA;

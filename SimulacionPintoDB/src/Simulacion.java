@@ -8,10 +8,10 @@ public class Simulacion {
     List<Consulta> listaC = new ArrayList();
     List<Evento> listaE = new ArrayList();
 
-    int n = 5; //ProcesosDisponibles
-    int p = 5; //MaximoConsultas
-    int m = 5; //MaximoSentencias
-    int c = 7;
+    int n = 1; //ProcesosDisponibles
+    int p = 1; //MaximoConsultas
+    int m = 1; //MaximoSentencias
+    int c = 1;
 
     Modulo moduloAC = new AdministracionConexiones(c);
     Modulo moduloAP = new AdministracionProcesos();
@@ -33,12 +33,16 @@ public class Simulacion {
         while (reloj < 50) {
             Evento evento = buscarMenor(listaE);
             reloj = evento.tiempo;
+            System.out.println("Reloj: "+reloj+" ID: "+evento.consulta.id+ " Sentencia: "+evento.consulta.tipoSentencia+ " Modulo: "+evento.modulo+" Evento: "+evento.tipoE);
             switch (evento.modulo) {
                 case ADM_CONEXIONES:
                     if (evento.tipoE == Evento.TipoEvento.ENTRADA) {
                         moduloAC.procesarEntrada(this, evento);
                     } else if (evento.tipoE == Evento.TipoEvento.SALIDA) {
                         moduloAC.procesarSalida(this, evento);
+                        if(listaE.isEmpty()){
+                        crearEvento();
+                        }
                     } else {
                         moduloAC.procesarRetiro(this, evento);
                     }
@@ -46,9 +50,11 @@ public class Simulacion {
                 case ADM_PROCESOS:
                     if (evento.tipoE == Evento.TipoEvento.ENTRADA) {
                         moduloAP.procesarEntrada(this, evento);
-                       //if(moduloAC.numMaxServidores != moduloAC.numServOcupados){
+                       if(moduloAC.numMaxServidores != moduloAC.numServOcupados){
                         crearEvento();
-                       //}
+                       }else{
+                       estadisticasT.conexionesDescartadas++;
+                       }
                     } else if (evento.tipoE == Evento.TipoEvento.SALIDA) {
                         moduloAP.procesarSalida(this, evento);
                     } else {
@@ -83,7 +89,8 @@ public class Simulacion {
                     }
                     break;
             }
-        }
+            imprimir();
+        }System.out.println(estadisticasT.conexionesDescartadas);
     }
 
     void crearEvento() {

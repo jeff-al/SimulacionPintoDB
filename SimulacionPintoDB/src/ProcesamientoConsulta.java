@@ -36,6 +36,7 @@ public class ProcesamientoConsulta extends Modulo {
             evento.modulo = evento.modulo.PROC_CONSULTAS;
             evento.tiempo = e.tiempo;
             numServOcupados--;
+            s.moduloAC.numServOcupados--;
         } else {                                     //Si no hace timeout
             Evento evento = new Evento(e.consulta);
             evento.tipoE = e.tipoE.ENTRADA;

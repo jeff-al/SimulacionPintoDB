@@ -21,6 +21,6 @@ public class AdministracionConexiones extends Modulo {
 
     @Override
     void procesarSalida(Simulacion s, Evento e) {
-        numServOcupados--;
+        s.moduloAC.numServOcupados--;
     }
 }
