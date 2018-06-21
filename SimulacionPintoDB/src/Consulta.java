@@ -4,6 +4,7 @@ public class Consulta {
     enum TipoSentencia {
         DDL, UPDATE, JOIN, SELECT
     };
+
     int id;
     TipoSentencia tipoSentencia;
     boolean soloLectura;
@@ -11,6 +12,8 @@ public class Consulta {
     double tiempoLlegada;
     double tiempoSalida;
     double tiempoEnsistema;
+    boolean enSistema = true;
+    Evento.TipoModulo moduloActual;
 
     EstadisticasConsulta estadistAdm_Conexiones;
     EstadisticasConsulta estadistAdm_Procesos;

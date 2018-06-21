@@ -7,7 +7,8 @@ public class AdministracionConexiones extends Modulo {
 
     @Override
     void procesarEntrada(Simulacion s, Evento e) {
-        e.consulta.estadistAdm_Conexiones.tiempoLlegadaModulo = e.tiempo;                       //Si no hay una consulta en cola
+        e.consulta.estadistAdm_Conexiones.tiempoLlegadaModulo = e.tiempo;
+        e.consulta.moduloActual = Evento.TipoModulo.ADM_CONEXIONES;                  
         double tiempoCarga = e.consulta.bloquesCargados / 64;
         e.consulta.estadistAdm_Conexiones.tiempoSalidaCola = 0;
         e.consulta.estadistAdm_Conexiones.tiempoSalidaModulo = e.tiempo + tiempoCarga;
@@ -22,5 +23,6 @@ public class AdministracionConexiones extends Modulo {
     @Override
     void procesarSalida(Simulacion s, Evento e) {
         s.moduloAC.numServOcupados--;
+        e.consulta.enSistema = false;
     }
 }

@@ -1,17 +1,17 @@
 
 import java.util.*;
 
-public class Simulacion {
+public class Simulacion extends Thread {
 
     int ids = 0;
-    double tiempoMaximo = 15;
+    double tiempoMaximo = 20;
     List<Consulta> listaC = new ArrayList();
     List<Evento> listaE = new ArrayList();
 
     int n = 1; //ProcesosDisponibles
     int p = 1; //MaximoConsultas
     int m = 1; //MaximoSentencias
-    int c = 1;
+    int c = 45;
 
     Modulo moduloAC = new AdministracionConexiones(c);
     Modulo moduloAP = new AdministracionProcesos();
@@ -28,69 +28,90 @@ public class Simulacion {
 
     void Simular() {
 
-        tiempoMaximo = 15;
         crearEvento();
         while (reloj < 50) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
             Evento evento = buscarMenor(listaE);
             reloj = evento.tiempo;
-            System.out.println("Reloj: "+reloj+" ID: "+evento.consulta.id+ " Sentencia: "+evento.consulta.tipoSentencia+ " Modulo: "+evento.modulo+" Evento: "+evento.tipoE);
-            switch (evento.modulo) {
-                case ADM_CONEXIONES:
-                    if (evento.tipoE == Evento.TipoEvento.ENTRADA) {
-                        moduloAC.procesarEntrada(this, evento);
-                    } else if (evento.tipoE == Evento.TipoEvento.SALIDA) {
-                        moduloAC.procesarSalida(this, evento);
-                        if(listaE.isEmpty()){
-                        crearEvento();
-                        }
-                    } else {
-                        moduloAC.procesarRetiro(this, evento);
+            System.out.print("\033[H\033[2J");
+            System.out.flush();
+            //System.out.println("Reloj: " + reloj + " ID: " + evento.consulta.id + " Sentencia: " + evento.consulta.tipoSentencia + " Modulo: " + evento.modulo + " Evento: " + evento.tipoE);
+            if (evento.consulta.enSistema) {
+                if (evento.tipoE == Evento.TipoEvento.RETIRO) {
+                    switch (evento.consulta.moduloActual) {
+                        case ADM_PROCESOS:
+                            moduloAP.procesarRetiro(this, evento);
+                            break;
+                        case ADM_CONEXIONES:
+                            moduloAC.procesarRetiro(this, evento);
+                            break;
+                        case PROC_CONSULTAS:
+                            moduloPC.procesarRetiro(this, evento);
+                            break;
+                        case TRANSACCIONES:
+                            moduloT.procesarRetiro(this, evento);
+                            break;
+                        case EJEC_SENTENCIAS:
+                            moduloES.procesarRetiro(this, evento);
+                            break;
                     }
-                    break;
-                case ADM_PROCESOS:
-                    if (evento.tipoE == Evento.TipoEvento.ENTRADA) {
-                        moduloAP.procesarEntrada(this, evento);
-                       if(moduloAC.numMaxServidores != moduloAC.numServOcupados){
-                        crearEvento();
-                       }else{
-                       estadisticasT.conexionesDescartadas++;
-                       }
-                    } else if (evento.tipoE == Evento.TipoEvento.SALIDA) {
-                        moduloAP.procesarSalida(this, evento);
-                    } else {
-                        moduloAP.procesarRetiro(this, evento);
+                    System.out.println("SALIO: " + evento.consulta.id);
+                } else {
+                    System.out.println("Reloj: " + reloj + " ID: " + evento.consulta.id + " Sentencia: " + evento.consulta.tipoSentencia + " Modulo: " + evento.modulo + " Evento: " + evento.tipoE);
+                    switch (evento.modulo) {
+                        case ADM_CONEXIONES:
+                            if (evento.tipoE == Evento.TipoEvento.ENTRADA) {
+                                moduloAC.procesarEntrada(this, evento);
+                            } else if (evento.tipoE == Evento.TipoEvento.SALIDA) {
+                                moduloAC.procesarSalida(this, evento);
+                                if (listaE.isEmpty()) {
+                                    crearEvento();
+                                }
+                            }
+                            break;
+                        case ADM_PROCESOS:
+                            if (evento.tipoE == Evento.TipoEvento.ENTRADA) {
+                                moduloAP.procesarEntrada(this, evento);
+                                if (moduloAC.numMaxServidores != moduloAC.numServOcupados) {
+                                    crearEvento();
+                                } else {
+                                    estadisticasT.conexionesDescartadas++;
+                                }
+                            } else if (evento.tipoE == Evento.TipoEvento.SALIDA) {
+                                moduloAP.procesarSalida(this, evento);
+                            }
+                            break;
+                        case PROC_CONSULTAS:
+                            if (evento.tipoE == Evento.TipoEvento.ENTRADA) {
+                                moduloPC.procesarEntrada(this, evento);
+                            } else if (evento.tipoE == Evento.TipoEvento.SALIDA) {
+                                moduloPC.procesarSalida(this, evento);
+                            }
+                            break;
+                        case TRANSACCIONES:
+                            if (evento.tipoE == Evento.TipoEvento.ENTRADA) {
+                                moduloT.procesarEntrada(this, evento);
+                            } else if (evento.tipoE == Evento.TipoEvento.SALIDA) {
+                                moduloT.procesarSalida(this, evento);
+                            }
+                            break;
+                        case EJEC_SENTENCIAS:
+                            if (evento.tipoE == Evento.TipoEvento.ENTRADA) {
+                                moduloES.procesarEntrada(this, evento);
+                            } else if (evento.tipoE == Evento.TipoEvento.SALIDA) {
+                                moduloES.procesarSalida(this, evento);
+                            }
+                            break;
                     }
-                    break;
-                case PROC_CONSULTAS:
-                    if (evento.tipoE == Evento.TipoEvento.ENTRADA) {
-                        moduloPC.procesarEntrada(this, evento);
-                    } else if (evento.tipoE == Evento.TipoEvento.SALIDA) {
-                        moduloPC.procesarSalida(this, evento);
-                    } else {
-                        moduloPC.procesarRetiro(this, evento);
-                    }
-                    break;
-                case TRANSACCIONES:
-                    if (evento.tipoE == Evento.TipoEvento.ENTRADA) {
-                        moduloT.procesarEntrada(this, evento);
-                    } else if (evento.tipoE == Evento.TipoEvento.SALIDA) {
-                        moduloT.procesarSalida(this, evento);
-                    } else {
-                        moduloT.procesarRetiro(this, evento);
-                    }
-                    break;
-                case EJEC_SENTENCIAS:
-                    if (evento.tipoE == Evento.TipoEvento.ENTRADA) {
-                        moduloES.procesarEntrada(this, evento);
-                    } else if (evento.tipoE == Evento.TipoEvento.SALIDA) {
-                        moduloES.procesarSalida(this, evento);
-                    } else {
-                        moduloES.procesarRetiro(this, evento);
-                    }
-                    break;
+                }
+
+                imprimir();
             }
-            imprimir();
-        }System.out.println(estadisticasT.conexionesDescartadas);
+        }
+        System.out.println(estadisticasT.conexionesDescartadas);
     }
 
     void crearEvento() {
@@ -118,6 +139,10 @@ public class Simulacion {
         Evento evento = new Evento(consulta);
         evento.tipoE = Evento.TipoEvento.ENTRADA;
         evento.modulo = evento.modulo.ADM_PROCESOS;
+
+        Evento eventoTO = new Evento(consulta);
+        eventoTO.tipoE = Evento.TipoEvento.RETIRO;
+        eventoTO.tiempo = reloj + tiempoMaximo;
         if (inicial) {
             evento.tiempo = 0;
             inicial = false;
@@ -126,6 +151,7 @@ public class Simulacion {
         }
         evento.consulta.bloquesCargados = 0;
         listaE.add(evento);
+        listaE.add(eventoTO);
         listaC.add(consulta);
         moduloAC.numServOcupados++;
     }
@@ -147,17 +173,14 @@ public class Simulacion {
     }
 
     void imprimir() {
-        for (int i = 0; i < listaC.size(); i++) {
-
-            //  System.out.print("Nombre significativo: " + listaC.get(i).id + " ");
-            //  System.out.print("bloquesCargados: " + listaC.get(i).bloquesCargados + " ");
-            //  System.out.print("tiempoLlegada: " + listaC.get(i).tiempoLlegada + " ");
-            //  System.out.print("tiempoSalida: " + listaC.get(i).tiempoSalida + " ");
-            //  System.out.print("tiempoSistema: " + listaC.get(i).tiempoEnsistema + "\n\n");
-        }
-        System.out.println("Cola AP: " + moduloAP.colaC.size());
-        System.out.println("Cola PC: " + moduloPC.colaC.size());
-        System.out.println("Cola ES: " + moduloES.colaC.size() + "\n\n");
+        System.out.print("AP ");
+        moduloAP.imprimirCola();
+        System.out.print("PC ");
+        moduloPC.imprimirCola();
+        System.out.print("TR ");
+        moduloT.imprimirCola();
+        System.out.print("ES ");
+        moduloES.imprimirCola();
     }
 
     public static void main(String[] args) {
