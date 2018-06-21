@@ -68,7 +68,7 @@ public class EjecucionDeSentencias extends Modulo {
             eventoS.tiempo = e.tiempo + tiempoEjec;
             s.listaE.add(eventoS);
             numServOcupados++;
-            
+
             Atendidos.add(eventoS.consulta);
         }
     }
@@ -76,45 +76,41 @@ public class EjecucionDeSentencias extends Modulo {
     @Override
     void procesarRetiro(Simulacion s, Evento e) {
         boolean enCola = false;
-        if (e.consulta.enSistema) {
-            Iterator<Consulta> it = s.moduloES.colaC.iterator();
-            while (it.hasNext()) {
-                Consulta c = it.next();
-                if (c == e.consulta) {
-                    System.out.print("ENTRA CONÑÑOOOOOOOO");
-                    it.remove();
-                    e.consulta.enSistema = false;
-                    e.consulta.tiempoEnsistema = e.tiempo - e.consulta.tiempoLlegada;
-                    e.consulta.tiempoSalida = e.tiempo;
-                    e.consulta.estadistEjec_Sentencias.tiempoSalidaCola = e.tiempo - e.consulta.estadistEjec_Sentencias.tiempoLlegadaModulo;
-                    enCola = true;
-                }
+        Iterator<Consulta> it = s.moduloES.colaC.iterator();
+        while (it.hasNext()) {
+            Consulta c = it.next();
+            if (c == e.consulta) {
+                it.remove();
+                e.consulta.tiempoEnsistema = e.tiempo - e.consulta.tiempoLlegada;
+                e.consulta.tiempoSalida = e.tiempo;
+                e.consulta.estadistEjec_Sentencias.tiempoSalidaCola = e.tiempo - e.consulta.estadistEjec_Sentencias.tiempoLlegadaModulo;
+                enCola = true;
             }
-            if (!enCola && !colaC.isEmpty()) {
-                Consulta consulta = colaC.remove();
-                double tiempoEjec = Math.pow(e.consulta.bloquesCargados, 2) * (1 / 1000);
-                switch (e.consulta.tipoSentencia) {
-                    case DDL:
-                        e.consulta.bloquesCargados = (int) generador.GenerarValUniforme(1, 64);
-                        tiempoEjec += 0.5;
-                        break;
-                    case UPDATE:
-                        e.consulta.bloquesCargados = 1;
-                        tiempoEjec += 1;
-                        break;
-                }
-                consulta.estadistEjec_Sentencias.tiempoSalidaCola = e.tiempo - consulta.estadistAdm_Procesos.tiempoLlegadaModulo;
-                Evento eventoS = new Evento(consulta);
-                eventoS.tipoE = e.tipoE.SALIDA;
-                eventoS.modulo = e.modulo.EJEC_SENTENCIAS;
-                eventoS.tiempo = e.tiempo + tiempoEjec;
-                s.listaE.add(eventoS);
-                Atendidos.remove(e.consulta);
-            } else if (!enCola) {
-                s.moduloES.numServOcupados--;
-                Atendidos.remove(e.consulta);
-            }
-            e.consulta.enSistema = false;
         }
+        if (!enCola && !colaC.isEmpty()) {
+            Consulta consulta = colaC.remove();
+            double tiempoEjec = Math.pow(e.consulta.bloquesCargados, 2) * (1 / 1000);
+            switch (e.consulta.tipoSentencia) {
+                case DDL:
+                    e.consulta.bloquesCargados = (int) generador.GenerarValUniforme(1, 64);
+                    tiempoEjec += 0.5;
+                    break;
+                case UPDATE:
+                    e.consulta.bloquesCargados = 1;
+                    tiempoEjec += 1;
+                    break;
+            }
+            consulta.estadistEjec_Sentencias.tiempoSalidaCola = e.tiempo - consulta.estadistAdm_Procesos.tiempoLlegadaModulo;
+            Evento eventoS = new Evento(consulta);
+            eventoS.tipoE = e.tipoE.SALIDA;
+            eventoS.modulo = e.modulo.EJEC_SENTENCIAS;
+            eventoS.tiempo = e.tiempo + tiempoEjec;
+            s.listaE.add(eventoS);
+            Atendidos.remove(e.consulta);
+        } else if (!enCola) {
+            s.moduloES.numServOcupados--;
+            Atendidos.remove(e.consulta);
+        }
+        e.consulta.enSistema = false;
     }
 }

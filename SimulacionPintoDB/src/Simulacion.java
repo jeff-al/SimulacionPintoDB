@@ -9,17 +9,17 @@ public class Simulacion extends Thread {
     List<Consulta> listaC = new ArrayList();
     List<Evento> listaE = new ArrayList();
 
-    int n; //ProcesosDisponibles
+    int n = 2; //ProcesosDisponibles
     int p; //MaximoConsultas
     int m; //MaximoSentencias
     int c;
 
-    Modulo moduloAC = new AdministracionConexiones(c);
-    Modulo moduloAP = new AdministracionProcesos();
-    Modulo moduloPC = new ProcesamientoConsulta(n);
-    Modulo moduloT = new Transacciones(p);
-    Modulo moduloES = new EjecucionDeSentencias(m);
-    
+    Modulo moduloAC;
+    Modulo moduloAP;
+    Modulo moduloPC;
+    Modulo moduloT;
+    Modulo moduloES;
+
     Ventanas.Interfaz interfaz = new Ventanas.Interfaz();
 
     GenValoresAleatorios generador = new GenValoresAleatorios();
@@ -35,7 +35,7 @@ public class Simulacion extends Thread {
         while (!interfaz.v3) {
             v3 = interfaz.datos.getV3();
             try {
-                Thread.sleep(200);
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
             }
         }
@@ -44,6 +44,11 @@ public class Simulacion extends Thread {
         c = interfaz.k;
         p = interfaz.p;
         m = interfaz.m;
+        moduloAC = new AdministracionConexiones(c);
+        moduloAP = new AdministracionProcesos();
+        moduloPC = new ProcesamientoConsulta(n);
+        moduloT = new Transacciones(p);
+        moduloES = new EjecucionDeSentencias(m);
         boolean pausa = false;
         crearEvento();
         while (reloj < tiempoM) {
@@ -57,7 +62,7 @@ public class Simulacion extends Thread {
             }
             if (interfaz.modoLento) {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(1500);
                 } catch (InterruptedException e) {
                 }
             }
@@ -84,7 +89,7 @@ public class Simulacion extends Thread {
                             moduloES.procesarRetiro(this, evento);
                             break;
                     }
-                    //System.out.println("SALIO: " + evento.consulta.id);
+                    moduloAC.numServOcupados--;
                     interfaz.corr.impDurante("SALIO: " + evento.consulta.id);
                 } else {
                     interfaz.corr.impDurante("ID Consulta: " + evento.consulta.id + " Tipo de Sentencia: " + evento.consulta.tipoSentencia + " Modulo: " + evento.modulo + " Evento: " + evento.tipoE + "\n");
@@ -100,11 +105,7 @@ public class Simulacion extends Thread {
                         case ADM_PROCESOS:
                             if (evento.tipoE == Evento.TipoEvento.ENTRADA) {
                                 moduloAP.procesarEntrada(this, evento);
-                                if (moduloAC.numMaxServidores != moduloAC.numServOcupados) {
-                                    crearEvento();
-                                } else {
-                                    estadisticasT.conexionesDescartadas++;
-                                }
+                                crearEvento();
                             } else if (evento.tipoE == Evento.TipoEvento.SALIDA) {
                                 moduloAP.procesarSalida(this, evento);
                             }
@@ -133,9 +134,6 @@ public class Simulacion extends Thread {
                     }
                 }
                 imprimir();
-            }
-            if (listaE.isEmpty()) {
-                crearEvento();
             }
         }
         System.out.println("Descartadas: " + estadisticasT.conexionesDescartadas);
@@ -181,7 +179,6 @@ public class Simulacion extends Thread {
         listaE.add(evento);
         listaE.add(eventoTO);
         listaC.add(consulta);
-        moduloAC.numServOcupados++;
     }
 
     Evento buscarMenor(List<Evento> lista) {
@@ -204,10 +201,19 @@ public class Simulacion extends Thread {
         interfaz.corr.impReloj("" + reloj + "\n");
         interfaz.corr.impCD("" + estadisticasT.conexionesDescartadas + "\n");
         interfaz.corr.impDurante("Reloj: " + reloj + "\n");
-        interfaz.corr.impDurante("Cola en modulo AP: " + moduloAP.colaC.size() + "\n");
-        interfaz.corr.impDurante("Cola en modulo PC: " + moduloPC.colaC.size() + "\n");
-        interfaz.corr.impDurante("Cola en modulo TR: " + moduloT.colaC.size() + "\n");
-        interfaz.corr.impDurante("Cola en modulo ES: " + moduloES.colaC.size() + "\n");
+        interfaz.corr.impDurante("Modulo AP  Serv Ocupados : " + moduloAP.numServOcupados + "/" + moduloAP.numMaxServidores);
+        interfaz.corr.impDurante("   Cola en modulo: " + moduloAP.colaC.size() + "\n");
+
+        interfaz.corr.impDurante("Modulo PC  Serv Ocupados : " + moduloPC.numServOcupados + "/" + moduloPC.numMaxServidores);
+        interfaz.corr.impDurante("   Cola en modulo: " + moduloPC.colaC.size() + "\n");
+
+        interfaz.corr.impDurante("Modulo TR  Serv Ocupados : " + moduloT.numServOcupados + "/" + moduloT.numMaxServidores);
+        interfaz.corr.impDurante("   Cola en modulo: " + moduloT.colaC.size() + "\n");
+
+        interfaz.corr.impDurante("Modulo ES  Serv Ocupados : " + moduloES.numServOcupados + "/" + moduloES.numMaxServidores);
+        interfaz.corr.impDurante("   Cola en modulo: " + moduloES.colaC.size() + "\n");
+
+        interfaz.corr.impDurante("Modulo AC  Serv Ocupados : " + moduloAC.numServOcupados + "/" + moduloAC.numMaxServidores);
         interfaz.corr.impDurante("\n\n\n");
         /*
         System.out.print("AP ");
@@ -230,7 +236,7 @@ public class Simulacion extends Thread {
         moduloAC.imprimirAtend();
         System.out.print("     -------------    ");
         moduloAC.imprimirCola();
-        */
+         */
     }
 
     public static void main(String[] args) {
@@ -238,5 +244,3 @@ public class Simulacion extends Thread {
         s.Simular();
     }
 }
-
-    //Falta Maim

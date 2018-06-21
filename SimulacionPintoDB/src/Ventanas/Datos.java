@@ -104,6 +104,11 @@ public class Datos extends javax.swing.JFrame {
         txt_M.setBackground(new java.awt.Color(51, 51, 51));
         txt_M.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         txt_M.setForeground(new java.awt.Color(240, 240, 240));
+        txt_M.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_MActionPerformed(evt);
+            }
+        });
         getContentPane().add(txt_M, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 340, 50, -1));
 
         txt_Iter.setBackground(new java.awt.Color(51, 51, 51));
@@ -119,6 +124,11 @@ public class Datos extends javax.swing.JFrame {
         txt_Tiempo.setBackground(new java.awt.Color(51, 51, 51));
         txt_Tiempo.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         txt_Tiempo.setForeground(new java.awt.Color(240, 240, 240));
+        txt_Tiempo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_TiempoActionPerformed(evt);
+            }
+        });
         getContentPane().add(txt_Tiempo, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 180, 50, -1));
 
         txt_K.setBackground(new java.awt.Color(51, 51, 51));
@@ -180,6 +190,14 @@ public class Datos extends javax.swing.JFrame {
     private void txt_IterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_IterActionPerformed
         
     }//GEN-LAST:event_txt_IterActionPerformed
+
+    private void txt_TiempoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_TiempoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txt_TiempoActionPerformed
+
+    private void txt_MActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_MActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txt_MActionPerformed
 
     public int getIter(){
         String texto = txt_Iter.getText();

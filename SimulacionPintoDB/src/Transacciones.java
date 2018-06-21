@@ -167,48 +167,44 @@ public class Transacciones extends Modulo {
     @Override
     void procesarRetiro(Simulacion s, Evento e) {
         boolean enCola = false;
-        if (e.consulta.enSistema) {
-            Iterator<Consulta> it = colaC.iterator();
-            while (it.hasNext()) {
-                Consulta c = it.next();
-                if (c == e.consulta) {
-                    System.out.print("ENTRA CONÑÑOOOOOOOO");
-                    it.remove();
-                    e.consulta.enSistema = false;
-                    e.consulta.tiempoEnsistema = e.tiempo - e.consulta.tiempoLlegada;
-                    e.consulta.tiempoSalida = e.tiempo;
-                    e.consulta.estadistTransacciones.tiempoSalidaCola = e.tiempo - e.consulta.estadistTransacciones.tiempoLlegadaModulo;
-                    enCola = true;
-                }
+        Iterator<Consulta> it = colaC.iterator();
+        while (it.hasNext()) {
+            Consulta c = it.next();
+            if (c == e.consulta) {
+                it.remove();
+                e.consulta.tiempoEnsistema = e.tiempo - e.consulta.tiempoLlegada;
+                e.consulta.tiempoSalida = e.tiempo;
+                e.consulta.estadistTransacciones.tiempoSalidaCola = e.tiempo - e.consulta.estadistTransacciones.tiempoLlegadaModulo;
+                enCola = true;
             }
-            if (!enCola && !PQ.isEmpty()) {
-                Consulta consulta = PQ.remove();
-                if (consulta.tipoSentencia == Consulta.TipoSentencia.DDL) {
-                    espera = true;
-                }
-                double tiempoTotal = numMaxServidores * 0.03;
-                switch (consulta.tipoSentencia) {
-                    case JOIN:
-                        consulta.bloquesCargados = (int) generador.GenerarValUniforme(1, 64);
-                        tiempoTotal += e.consulta.bloquesCargados * 0.1;
-                        break;
-                    case SELECT:
-                        consulta.bloquesCargados = 1;
-                        tiempoTotal += 0.1;
-                        break;
-                }
-                consulta.estadistTransacciones.tiempoSalidaCola = e.tiempo - e.consulta.estadistTransacciones.tiempoLlegadaModulo;
-                Evento eventoS = new Evento(e.consulta);
-                eventoS.tipoE = Evento.TipoEvento.SALIDA;
-                eventoS.modulo = Evento.TipoModulo.TRANSACCIONES;
-                eventoS.tiempo = e.tiempo + tiempoTotal;
-                s.listaE.add(eventoS);
-                Atendidos.remove(e.consulta);
-            } else if (!enCola) {
-                s.moduloT.numServOcupados--;
-                Atendidos.remove(e.consulta);
-            }
-            e.consulta.enSistema = false;
         }
+        if (!enCola && !PQ.isEmpty()) {
+            Consulta consulta = PQ.remove();
+            if (consulta.tipoSentencia == Consulta.TipoSentencia.DDL) {
+                espera = true;
+            }
+            double tiempoTotal = numMaxServidores * 0.03;
+            switch (consulta.tipoSentencia) {
+                case JOIN:
+                    consulta.bloquesCargados = (int) generador.GenerarValUniforme(1, 64);
+                    tiempoTotal += e.consulta.bloquesCargados * 0.1;
+                    break;
+                case SELECT:
+                    consulta.bloquesCargados = 1;
+                    tiempoTotal += 0.1;
+                    break;
+            }
+            consulta.estadistTransacciones.tiempoSalidaCola = e.tiempo - e.consulta.estadistTransacciones.tiempoLlegadaModulo;
+            Evento eventoS = new Evento(e.consulta);
+            eventoS.tipoE = Evento.TipoEvento.SALIDA;
+            eventoS.modulo = Evento.TipoModulo.TRANSACCIONES;
+            eventoS.tiempo = e.tiempo + tiempoTotal;
+            s.listaE.add(eventoS);
+            Atendidos.remove(e.consulta);
+        } else if (!enCola) {
+            s.moduloT.numServOcupados--;
+            Atendidos.remove(e.consulta);
+        }
+        e.consulta.enSistema = false;
     }
 }

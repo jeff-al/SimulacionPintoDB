@@ -70,14 +70,11 @@ public class ProcesamientoConsulta extends Modulo {
     @Override
     void procesarRetiro(Simulacion s, Evento e) {
         boolean enCola = false;
-        if (e.consulta.enSistema) {
             Iterator<Consulta> it = s.moduloPC.colaC.iterator();
             while (it.hasNext()) {
                 Consulta c = it.next();
-                if (c == e.consulta) {
-                    System.out.print("ENTRA CONÑÑOOOOOOOO");
-                    s.moduloPC.colaC.remove(e.consulta);
-                    e.consulta.enSistema = false;
+                if (c == e.consulta) { //Lo busca en la cola
+                    it.remove();
                     e.consulta.tiempoEnsistema = e.tiempo - e.consulta.tiempoLlegada;
                     e.consulta.tiempoSalida = e.tiempo;
                     e.consulta.estadistProc_Consultas.tiempoSalidaCola = e.tiempo - e.consulta.estadistProc_Consultas.tiempoLlegadaModulo;
@@ -95,10 +92,9 @@ public class ProcesamientoConsulta extends Modulo {
                 s.listaE.add(eventoS);
                 Atendidos.remove(e.consulta);
             }else if(!enCola){
-                s.moduloPC.numServOcupados--;
+                numServOcupados--;
                 Atendidos.remove(e.consulta);
             }
             e.consulta.enSistema = false;
-        }
     }
 }

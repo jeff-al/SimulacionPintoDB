@@ -23,7 +23,7 @@ public class AdministracionConexiones extends Modulo {
 
     @Override
     void procesarSalida(Simulacion s, Evento e) {
-        s.moduloAC.numServOcupados--;
+        numServOcupados--;
         e.consulta.enSistema = false;
         Atendidos.remove(e.consulta);
     }
