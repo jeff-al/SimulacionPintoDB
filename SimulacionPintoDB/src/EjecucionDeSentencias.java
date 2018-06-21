@@ -32,6 +32,7 @@ public class EjecucionDeSentencias extends Modulo {
             evento.tiempo = e.tiempo + tiempoEjec;
             s.listaE.add(evento);
             numServOcupados++;
+            Atendidos.add(e.consulta);
         }
     }
 
@@ -46,6 +47,7 @@ public class EjecucionDeSentencias extends Modulo {
         evento.tiempo = e.tiempo;
         numServOcupados--;
         s.listaE.add(evento);
+        Atendidos.remove(e.consulta);
         if (!colaC.isEmpty()) {   //Si despues de una salida hay algo en cola
             Consulta consulta = colaC.remove();
             double tiempoEjec = Math.pow(e.consulta.bloquesCargados, 2) * (1 / 1000);
@@ -66,6 +68,8 @@ public class EjecucionDeSentencias extends Modulo {
             eventoS.tiempo = e.tiempo + tiempoEjec;
             s.listaE.add(eventoS);
             numServOcupados++;
+            
+            Atendidos.add(eventoS.consulta);
         }
     }
 
@@ -105,8 +109,10 @@ public class EjecucionDeSentencias extends Modulo {
                 eventoS.modulo = e.modulo.EJEC_SENTENCIAS;
                 eventoS.tiempo = e.tiempo + tiempoEjec;
                 s.listaE.add(eventoS);
+                Atendidos.remove(e.consulta);
             } else if (!enCola) {
                 s.moduloES.numServOcupados--;
+                Atendidos.remove(e.consulta);
             }
             e.consulta.enSistema = false;
         }

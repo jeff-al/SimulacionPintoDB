@@ -4,14 +4,14 @@ import java.util.*;
 public class Simulacion extends Thread {
 
     int ids = 0;
-    double tiempoMaximo = 20;
+    double tiempoMaximo = 15;
     List<Consulta> listaC = new ArrayList();
     List<Evento> listaE = new ArrayList();
 
-    int n = 1; //ProcesosDisponibles
-    int p = 1; //MaximoConsultas
+    int n = 3; //ProcesosDisponibles
+    int p = 2; //MaximoConsultas
     int m = 1; //MaximoSentencias
-    int c = 45;
+    int c = 5;
 
     Modulo moduloAC = new AdministracionConexiones(c);
     Modulo moduloAP = new AdministracionProcesos();
@@ -29,15 +29,14 @@ public class Simulacion extends Thread {
     void Simular() {
 
         crearEvento();
-        while (reloj < 50) {
+        while (reloj < 15000) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(0);
             } catch (InterruptedException e) {
             }
             Evento evento = buscarMenor(listaE);
             reloj = evento.tiempo;
             System.out.print("\033[H\033[2J");
-            System.out.flush();
             //System.out.println("Reloj: " + reloj + " ID: " + evento.consulta.id + " Sentencia: " + evento.consulta.tipoSentencia + " Modulo: " + evento.modulo + " Evento: " + evento.tipoE);
             if (evento.consulta.enSistema) {
                 if (evento.tipoE == Evento.TipoEvento.RETIRO) {
@@ -67,9 +66,6 @@ public class Simulacion extends Thread {
                                 moduloAC.procesarEntrada(this, evento);
                             } else if (evento.tipoE == Evento.TipoEvento.SALIDA) {
                                 moduloAC.procesarSalida(this, evento);
-                                if (listaE.isEmpty()) {
-                                    crearEvento();
-                                }
                             }
                             break;
                         case ADM_PROCESOS:
@@ -107,11 +103,14 @@ public class Simulacion extends Thread {
                             break;
                     }
                 }
-
-                imprimir();
+           //     imprimir();
+            }
+            if (listaE.isEmpty()) {
+                crearEvento();
             }
         }
-        System.out.println(estadisticasT.conexionesDescartadas);
+        System.out.println("Descartadas: " + estadisticasT.conexionesDescartadas);
+        System.out.println("Totales: " + ids);
     }
 
     void crearEvento() {
@@ -174,13 +173,25 @@ public class Simulacion extends Thread {
 
     void imprimir() {
         System.out.print("AP ");
+        moduloAP.imprimirAtend();
+        System.out.print("     -------------    ");
         moduloAP.imprimirCola();
         System.out.print("PC ");
+        moduloPC.imprimirAtend();
+        System.out.print("     -------------    ");
         moduloPC.imprimirCola();
         System.out.print("TR ");
+        moduloT.imprimirAtend();
+        System.out.print("     -------------    ");
         moduloT.imprimirCola();
         System.out.print("ES ");
+        moduloES.imprimirAtend();
+        System.out.print("     -------------    ");
         moduloES.imprimirCola();
+        System.out.print("AC ");
+        moduloAC.imprimirAtend();
+        System.out.print("     -------------    ");
+        moduloAC.imprimirCola();
     }
 
     public static void main(String[] args) {

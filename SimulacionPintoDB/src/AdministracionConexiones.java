@@ -18,11 +18,13 @@ public class AdministracionConexiones extends Modulo {
         evento.modulo = e.modulo.ADM_CONEXIONES;
         evento.tiempo = e.tiempo + tiempoCarga;
         s.listaE.add(evento);
+        Atendidos.add(e.consulta);
     }
 
     @Override
     void procesarSalida(Simulacion s, Evento e) {
         s.moduloAC.numServOcupados--;
         e.consulta.enSistema = false;
+        Atendidos.remove(e.consulta);
     }
 }

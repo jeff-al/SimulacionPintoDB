@@ -26,6 +26,7 @@ public class AdministracionProcesos extends Modulo {
             evento.tiempo = e.tiempo + tiempoHilo;
             s.listaE.add(evento);
             numServOcupados = 1;
+            Atendidos.add(e.consulta);
 
         }
 
@@ -41,6 +42,7 @@ public class AdministracionProcesos extends Modulo {
         evento.tiempo = e.tiempo;
         numServOcupados = 0;
         s.listaE.add(evento);
+        Atendidos.remove(e.consulta);
 
         if (!colaC.isEmpty()) {   //Si despues de una salida hay algo en cola
             Consulta consulta = colaC.remove();
@@ -52,6 +54,7 @@ public class AdministracionProcesos extends Modulo {
             eventoS.tiempo = e.tiempo + tiempoHilo;
             s.listaE.add(eventoS);
             numServOcupados = 1;
+            Atendidos.add(eventoS.consulta);
         }
     }
 
@@ -82,8 +85,10 @@ public class AdministracionProcesos extends Modulo {
                 eventoS.tiempo = e.tiempo + tiempoHilo;
                 s.listaE.add(eventoS);
                 numServOcupados = 1;
+                Atendidos.remove(e.consulta);
             }else if(!enCola){
                 numServOcupados = 0;
+                Atendidos.remove(e.consulta);
             }
             e.consulta.enSistema = false;
         }

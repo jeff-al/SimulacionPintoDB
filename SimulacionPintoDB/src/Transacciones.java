@@ -84,6 +84,7 @@ public class Transacciones extends Modulo {
                         evento.tiempo = e.tiempo + tiempoTotal;
                         s.listaE.add(evento);
                         numServOcupados++;
+                        Atendidos.add(e.consulta);
                     }
                 } else {
                     double tiempoTotal = numMaxServidores * 0.03;
@@ -104,6 +105,7 @@ public class Transacciones extends Modulo {
                     evento.tiempo = e.tiempo + tiempoTotal;
                     s.listaE.add(evento);
                     numServOcupados++;
+                    Atendidos.add(e.consulta);
                 }
             }
         }
@@ -119,7 +121,7 @@ public class Transacciones extends Modulo {
         evento.tiempo = e.tiempo;
         numServOcupados--;
         s.listaE.add(evento);
-
+        Atendidos.remove(e.consulta);
         if (e.consulta.tipoSentencia == Consulta.TipoSentencia.DDL) {
             espera = false;
         }
@@ -140,12 +142,14 @@ public class Transacciones extends Modulo {
                     break;
             }
             consulta.estadistTransacciones.tiempoSalidaCola = e.tiempo - e.consulta.estadistTransacciones.tiempoLlegadaModulo;
-            Evento eventoS = new Evento(e.consulta);
+            Evento eventoS = new Evento(consulta);
             eventoS.tipoE = Evento.TipoEvento.SALIDA;
             eventoS.modulo = Evento.TipoModulo.TRANSACCIONES;
             eventoS.tiempo = e.tiempo + tiempoTotal;
             s.listaE.add(eventoS);
             numServOcupados++;
+
+            Atendidos.add(eventoS.consulta);
         }
     }
 
@@ -199,8 +203,10 @@ public class Transacciones extends Modulo {
                 eventoS.modulo = Evento.TipoModulo.TRANSACCIONES;
                 eventoS.tiempo = e.tiempo + tiempoTotal;
                 s.listaE.add(eventoS);
+                Atendidos.remove(e.consulta);
             } else if (!enCola) {
                 s.moduloT.numServOcupados--;
+                Atendidos.remove(e.consulta);
             }
             e.consulta.enSistema = false;
         }
