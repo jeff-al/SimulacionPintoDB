@@ -5,19 +5,22 @@ public class Simulacion extends Thread {
 
     int ids = 0;
     double tiempoMaximo = 15;
+    double tiempoM;
     List<Consulta> listaC = new ArrayList();
     List<Evento> listaE = new ArrayList();
 
-    int n = 3; //ProcesosDisponibles
-    int p = 2; //MaximoConsultas
-    int m = 1; //MaximoSentencias
-    int c = 5;
+    int n; //ProcesosDisponibles
+    int p; //MaximoConsultas
+    int m; //MaximoSentencias
+    int c;
 
     Modulo moduloAC = new AdministracionConexiones(c);
     Modulo moduloAP = new AdministracionProcesos();
     Modulo moduloPC = new ProcesamientoConsulta(n);
     Modulo moduloT = new Transacciones(p);
     Modulo moduloES = new EjecucionDeSentencias(m);
+    
+    Ventanas.Interfaz interfaz = new Ventanas.Interfaz();
 
     GenValoresAleatorios generador = new GenValoresAleatorios();
     EstadisticasTotales estadisticasT = new EstadisticasTotales();
@@ -27,12 +30,36 @@ public class Simulacion extends Thread {
     boolean inicial = true;
 
     void Simular() {
-
-        crearEvento();
-        while (reloj < 15000) {
+        interfaz.run();
+        boolean v3 = false;
+        while (!interfaz.v3) {
+            v3 = interfaz.datos.getV3();
             try {
-                Thread.sleep(0);
+                Thread.sleep(200);
             } catch (InterruptedException e) {
+            }
+        }
+        tiempoM = interfaz.tM;
+        tiempoMaximo = interfaz.t;
+        c = interfaz.k;
+        p = interfaz.p;
+        m = interfaz.m;
+        boolean pausa = false;
+        crearEvento();
+        while (reloj < tiempoM) {
+            pausa = interfaz.corr.getPausa();
+            while (pausa) {
+                pausa = interfaz.corr.getPausa();
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                }
+            }
+            if (interfaz.modoLento) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                }
             }
             Evento evento = buscarMenor(listaE);
             reloj = evento.tiempo;
@@ -57,9 +84,11 @@ public class Simulacion extends Thread {
                             moduloES.procesarRetiro(this, evento);
                             break;
                     }
-                    System.out.println("SALIO: " + evento.consulta.id);
+                    //System.out.println("SALIO: " + evento.consulta.id);
+                    interfaz.corr.impDurante("SALIO: " + evento.consulta.id);
                 } else {
-                    System.out.println("Reloj: " + reloj + " ID: " + evento.consulta.id + " Sentencia: " + evento.consulta.tipoSentencia + " Modulo: " + evento.modulo + " Evento: " + evento.tipoE);
+                    interfaz.corr.impDurante("ID Consulta: " + evento.consulta.id + " Tipo de Sentencia: " + evento.consulta.tipoSentencia + " Modulo: " + evento.modulo + " Evento: " + evento.tipoE + "\n");
+                    //System.out.println("Reloj: " + reloj + " ID: " + evento.consulta.id + " Sentencia: " + evento.consulta.tipoSentencia + " Modulo: " + evento.modulo + " Evento: " + evento.tipoE);
                     switch (evento.modulo) {
                         case ADM_CONEXIONES:
                             if (evento.tipoE == Evento.TipoEvento.ENTRADA) {
@@ -103,7 +132,7 @@ public class Simulacion extends Thread {
                             break;
                     }
                 }
-           //     imprimir();
+                imprimir();
             }
             if (listaE.isEmpty()) {
                 crearEvento();
@@ -172,6 +201,15 @@ public class Simulacion extends Thread {
     }
 
     void imprimir() {
+        interfaz.corr.impReloj("" + reloj + "\n");
+        interfaz.corr.impCD("" + estadisticasT.conexionesDescartadas + "\n");
+        interfaz.corr.impDurante("Reloj: " + reloj + "\n");
+        interfaz.corr.impDurante("Cola en modulo AP: " + moduloAP.colaC.size() + "\n");
+        interfaz.corr.impDurante("Cola en modulo PC: " + moduloPC.colaC.size() + "\n");
+        interfaz.corr.impDurante("Cola en modulo TR: " + moduloT.colaC.size() + "\n");
+        interfaz.corr.impDurante("Cola en modulo ES: " + moduloES.colaC.size() + "\n");
+        interfaz.corr.impDurante("\n\n\n");
+        /*
         System.out.print("AP ");
         moduloAP.imprimirAtend();
         System.out.print("     -------------    ");
@@ -192,6 +230,7 @@ public class Simulacion extends Thread {
         moduloAC.imprimirAtend();
         System.out.print("     -------------    ");
         moduloAC.imprimirCola();
+        */
     }
 
     public static void main(String[] args) {
