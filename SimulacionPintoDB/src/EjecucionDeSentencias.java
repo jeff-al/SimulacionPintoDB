@@ -13,8 +13,9 @@ public class EjecucionDeSentencias extends Modulo {
         e.consulta.moduloActual = Evento.TipoModulo.EJEC_SENTENCIAS;
         if (numServOcupados == numMaxServidores) { //Si ya hay una consulta siendo procesada
             colaC.add(e.consulta);
+            s.estadisticasT.promedioColaES += colaC.size();
         } else {                       //Si no hay una consulta en cola
-            double tiempoEjec = Math.pow(e.consulta.bloquesCargados, 2) * (1 / 1000);
+            double tiempoEjec = Math.pow(e.consulta.bloquesCargados, 2) * (1 / 1000); //Milisegundos a segundos
             switch (e.consulta.tipoSentencia) {
                 case DDL:
                     e.consulta.bloquesCargados = (int) generador.GenerarValUniforme(1, 64);
@@ -50,14 +51,15 @@ public class EjecucionDeSentencias extends Modulo {
         Atendidos.remove(e.consulta);
         if (!colaC.isEmpty()) {   //Si despues de una salida hay algo en cola
             Consulta consulta = colaC.remove();
-            double tiempoEjec = Math.pow(e.consulta.bloquesCargados, 2) * (1 / 1000);
+            s.estadisticasT.promedioColaES += colaC.size();
+            double tiempoEjec = Math.pow(consulta.bloquesCargados, 2) * (1 / 1000);
             switch (e.consulta.tipoSentencia) {
                 case DDL:
-                    e.consulta.bloquesCargados = (int) generador.GenerarValUniforme(1, 64);
+                    consulta.bloquesCargados = (int) generador.GenerarValUniforme(1, 64);
                     tiempoEjec += 0.5;
                     break;
                 case UPDATE:
-                    e.consulta.bloquesCargados = 1;
+                    consulta.bloquesCargados = 1;
                     tiempoEjec += 1;
                     break;
             }
@@ -81,6 +83,7 @@ public class EjecucionDeSentencias extends Modulo {
             Consulta c = it.next();
             if (c == e.consulta) {
                 it.remove();
+                s.estadisticasT.promedioColaES += colaC.size();
                 e.consulta.tiempoEnsistema = e.tiempo - e.consulta.tiempoLlegada;
                 e.consulta.tiempoSalida = e.tiempo;
                 e.consulta.estadistEjec_Sentencias.tiempoSalidaCola = e.tiempo - e.consulta.estadistEjec_Sentencias.tiempoLlegadaModulo;
@@ -89,14 +92,15 @@ public class EjecucionDeSentencias extends Modulo {
         }
         if (!enCola && !colaC.isEmpty()) {
             Consulta consulta = colaC.remove();
-            double tiempoEjec = Math.pow(e.consulta.bloquesCargados, 2) * (1 / 1000);
-            switch (e.consulta.tipoSentencia) {
+            s.estadisticasT.promedioColaES += colaC.size();
+            double tiempoEjec = Math.pow(consulta.bloquesCargados, 2) * (1 / 1000);
+            switch (consulta.tipoSentencia) {
                 case DDL:
-                    e.consulta.bloquesCargados = (int) generador.GenerarValUniforme(1, 64);
+                    consulta.bloquesCargados = (int) generador.GenerarValUniforme(1, 64);
                     tiempoEjec += 0.5;
                     break;
                 case UPDATE:
-                    e.consulta.bloquesCargados = 1;
+                    consulta.bloquesCargados = 1;
                     tiempoEjec += 1;
                     break;
             }
@@ -106,9 +110,11 @@ public class EjecucionDeSentencias extends Modulo {
             eventoS.modulo = e.modulo.EJEC_SENTENCIAS;
             eventoS.tiempo = e.tiempo + tiempoEjec;
             s.listaE.add(eventoS);
+            numServOcupados++;
             Atendidos.remove(e.consulta);
-        } else if (!enCola) {
-            s.moduloES.numServOcupados--;
+        }
+        if (!enCola) {
+            numServOcupados--;
             Atendidos.remove(e.consulta);
         }
         e.consulta.enSistema = false;

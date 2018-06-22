@@ -4,7 +4,7 @@ import java.util.*;
 public class Simulacion extends Thread {
 
     int ids = 0;
-    double tiempoMaximo = 15;
+    double tiempoMaximo;
     double tiempoM;
     List<Consulta> listaC = new ArrayList();
     List<Evento> listaE = new ArrayList();
@@ -69,31 +69,30 @@ public class Simulacion extends Thread {
             }
             Evento evento = buscarMenor(listaE);
             reloj = evento.tiempo;
-            System.out.print("\033[H\033[2J");
             //System.out.println("Reloj: " + reloj + " ID: " + evento.consulta.id + " Sentencia: " + evento.consulta.tipoSentencia + " Modulo: " + evento.modulo + " Evento: " + evento.tipoE);
             if (evento.consulta.enSistema) {
                 if (evento.tipoE == Evento.TipoEvento.RETIRO) {
                     switch (evento.consulta.moduloActual) {
                         case ADM_PROCESOS:
                             moduloAP.procesarRetiro(this, evento);
-                            break;
-                        case ADM_CONEXIONES:
-                            moduloAC.procesarRetiro(this, evento);
+                            moduloAC.numServOcupados--;
                             break;
                         case PROC_CONSULTAS:
                             moduloPC.procesarRetiro(this, evento);
+                            moduloAC.numServOcupados--;
                             break;
                         case TRANSACCIONES:
                             moduloT.procesarRetiro(this, evento);
+                            moduloAC.numServOcupados--;
                             break;
                         case EJEC_SENTENCIAS:
                             moduloES.procesarRetiro(this, evento);
+                            moduloAC.numServOcupados--;
                             break;
                     }
-                    moduloAC.numServOcupados--;
-                    interfaz.corr.impDurante("SALIO: " + evento.consulta.id);
+                    interfaz.corr.impDurante("SALIO: " + evento.consulta.id + "  -------  ");
                 } else {
-                    interfaz.corr.impDurante("ID Consulta: " + evento.consulta.id + " Tipo de Sentencia: " + evento.consulta.tipoSentencia + " Modulo: " + evento.modulo + " Evento: " + evento.tipoE + "\n");
+                    interfaz.corr.impDurante("ID Consulta: " + evento.consulta.id + "  -------  Tipo de Sentencia: " + evento.consulta.tipoSentencia + "  -------  Modulo: " + evento.modulo + "  -------  Evento: " + evento.tipoE + "\n");
                     //System.out.println("Reloj: " + reloj + " ID: " + evento.consulta.id + " Sentencia: " + evento.consulta.tipoSentencia + " Modulo: " + evento.modulo + " Evento: " + evento.tipoE);
                     switch (evento.modulo) {
                         case ADM_CONEXIONES:
@@ -137,8 +136,13 @@ public class Simulacion extends Thread {
                 imprimir();
             }
         }
+        estadisticasT.promediarCola(listaC);
         System.out.println("Descartadas: " + estadisticasT.conexionesDescartadas);
         System.out.println("Totales: " + ids);
+        System.out.println("Tamaño Promedio de la cola AP: " + estadisticasT.promedioColaAP);
+        System.out.println("Tamaño Promedio de la cola PC: " + estadisticasT.promedioColaPC);
+        System.out.println("Tamaño Promedio de la cola T: " + estadisticasT.promedioColaT);
+        System.out.println("Tamaño Promedio de la cola ES: " + estadisticasT.promedioColaES);
     }
 
     void crearEvento() {
@@ -158,7 +162,6 @@ public class Simulacion extends Thread {
             consulta.tipoSentencia = consulta.tipoSentencia.DDL;
             consulta.soloLectura = false;
         }
-        consulta.tiempoLlegada = reloj;
         consulta.estadistAdm_Conexiones.tiempoLlegadaModulo = reloj;  //Se puede eliminar todo
         consulta.estadistAdm_Conexiones.tiempoSalidaModulo = reloj;
         consulta.estadistAdm_Conexiones.tiempoSalidaCola = 0;
@@ -169,12 +172,15 @@ public class Simulacion extends Thread {
 
         Evento eventoTO = new Evento(consulta);
         eventoTO.tipoE = Evento.TipoEvento.RETIRO;
-        eventoTO.tiempo = reloj + tiempoMaximo;
         if (inicial) {
             evento.tiempo = 0;
+            consulta.tiempoLlegada = reloj;
+            eventoTO.tiempo = reloj + tiempoMaximo;
             inicial = false;
         } else {
             evento.tiempo = reloj + generador.GenerarValExponencial(0.5);
+            consulta.tiempoLlegada = evento.tiempo;
+            eventoTO.tiempo = evento.tiempo + tiempoMaximo;
         }
         evento.consulta.bloquesCargados = 0;
         listaE.add(evento);
@@ -199,9 +205,9 @@ public class Simulacion extends Thread {
     }
 
     void imprimir() {
-        interfaz.corr.impReloj("" + reloj + "\n");
+        interfaz.corr.impReloj("" + String.format("%.2f", reloj) + " seg\n");
         interfaz.corr.impCD("" + estadisticasT.conexionesDescartadas + "\n");
-        interfaz.corr.impDurante("Reloj: " + reloj + "\n");
+        interfaz.corr.impDurante("Reloj: " + String.format("%.2f", reloj) + " seg\n");
         interfaz.corr.impDurante("Modulo AP  Serv Ocupados : " + moduloAP.numServOcupados + "/" + moduloAP.numMaxServidores);
         interfaz.corr.impDurante("   Cola en modulo: " + moduloAP.colaC.size() + "\n");
 
@@ -209,12 +215,12 @@ public class Simulacion extends Thread {
         interfaz.corr.impDurante("   Cola en modulo: " + moduloPC.colaC.size() + "\n");
 
         interfaz.corr.impDurante("Modulo TR  Serv Ocupados : " + moduloT.numServOcupados + "/" + moduloT.numMaxServidores);
-        interfaz.corr.impDurante("   Cola en modulo: " + moduloT.colaC.size() + "\n");
+        interfaz.corr.impDurante("   Cola en modulo: " + moduloT.Colasize() + "\n");
 
         interfaz.corr.impDurante("Modulo ES  Serv Ocupados : " + moduloES.numServOcupados + "/" + moduloES.numMaxServidores);
         interfaz.corr.impDurante("   Cola en modulo: " + moduloES.colaC.size() + "\n");
 
-        interfaz.corr.impDurante("Modulo AC  Serv Ocupados : " + moduloAC.numServOcupados + "/" + moduloAC.numMaxServidores);
+        interfaz.corr.impDurante("Modulo AC  Conexiones Actuales : " + moduloAC.numServOcupados + "/" + moduloAC.numMaxServidores + "  " + tiempoMaximo);
         interfaz.corr.impDurante("\n\n\n");
         /*
         System.out.print("AP ");

@@ -56,27 +56,20 @@ public class Transacciones extends Modulo {
         e.consulta.moduloActual = Evento.TipoModulo.TRANSACCIONES;
         if (numServOcupados == numMaxServidores) { //Si ya hay una consulta siendo procesada
             PQ.add(e.consulta);
+            s.estadisticasT.promedioColaT += PQ.size();
         } else {                       //Si no hay una consulta en cola
             if (espera) {
                 PQ.add(e.consulta);
-            } else {
+                s.estadisticasT.promedioColaT += PQ.size();
+            } else {                                                  //Si hay servidores libres y no hay DDL adentro
                 if (e.consulta.tipoSentencia == Consulta.TipoSentencia.DDL) {
                     if (numServOcupados > 0) {
                         PQ.add(e.consulta);
+                        s.estadisticasT.promedioColaT += PQ.size();
                         espera = true;
                     } else {
                         espera = true;
                         double tiempoTotal = numMaxServidores * 0.03;
-                        switch (e.consulta.tipoSentencia) {
-                            case JOIN:
-                                e.consulta.bloquesCargados = (int) generador.GenerarValUniforme(1, 64);
-                                tiempoTotal += e.consulta.bloquesCargados * 0.1;
-                                break;
-                            case SELECT:
-                                e.consulta.bloquesCargados = 1;
-                                tiempoTotal += 0.1;
-                                break;
-                        }
                         e.consulta.estadistTransacciones.tiempoSalidaCola = 0;
                         Evento evento = new Evento(e.consulta);
                         evento.tipoE = e.tipoE.SALIDA;
@@ -126,30 +119,43 @@ public class Transacciones extends Modulo {
             espera = false;
         }
         if (!PQ.isEmpty()) {   //Si despues de una salida hay algo en cola
-            Consulta consulta = PQ.remove();
+            Consulta consulta = PQ.peek();
             if (consulta.tipoSentencia == Consulta.TipoSentencia.DDL) {
+                if (numServOcupados == 0) {
+                    double tiempoTotal = numMaxServidores * 0.03;
+                    consulta = PQ.remove();
+                    Evento eventoS = new Evento(consulta);
+                    eventoS.tipoE = e.tipoE.SALIDA;
+                    eventoS.modulo = e.modulo.TRANSACCIONES;
+                    s.listaE.add(eventoS);
+                    s.estadisticasT.promedioColaT += PQ.size();
+                    eventoS.tiempo = e.tiempo + tiempoTotal;
+                    Atendidos.add(e.consulta);
+                    numServOcupados++;
+                }
                 espera = true;
+            } else {
+                while (!PQ.isEmpty() && (numServOcupados < numMaxServidores)) {
+                    double tiempoTotal = numMaxServidores * 0.03;
+                    consulta = PQ.remove();
+                    Evento eventoS = new Evento(consulta);
+                    eventoS.tipoE = e.tipoE.SALIDA;
+                    eventoS.modulo = e.modulo.TRANSACCIONES;
+                    switch (consulta.tipoSentencia) {
+                        case JOIN:
+                            consulta.bloquesCargados = (int) generador.GenerarValUniforme(1, 64);
+                            tiempoTotal += consulta.bloquesCargados * 0.1;
+                            break;
+                        case SELECT:
+                            consulta.bloquesCargados = 1;
+                            tiempoTotal += 0.1;
+                            break;
+                    }
+                    consulta.estadistTransacciones.tiempoSalidaCola = e.tiempo - e.consulta.estadistTransacciones.tiempoLlegadaModulo;
+                    eventoS.tiempo = e.tiempo + tiempoTotal;
+                    numServOcupados++;
+                }
             }
-            double tiempoTotal = numMaxServidores * 0.03;
-            switch (consulta.tipoSentencia) {
-                case JOIN:
-                    consulta.bloquesCargados = (int) generador.GenerarValUniforme(1, 64);
-                    tiempoTotal += e.consulta.bloquesCargados * 0.1;
-                    break;
-                case SELECT:
-                    consulta.bloquesCargados = 1;
-                    tiempoTotal += 0.1;
-                    break;
-            }
-            consulta.estadistTransacciones.tiempoSalidaCola = e.tiempo - e.consulta.estadistTransacciones.tiempoLlegadaModulo;
-            Evento eventoS = new Evento(consulta);
-            eventoS.tipoE = Evento.TipoEvento.SALIDA;
-            eventoS.modulo = Evento.TipoModulo.TRANSACCIONES;
-            eventoS.tiempo = e.tiempo + tiempoTotal;
-            s.listaE.add(eventoS);
-            numServOcupados++;
-
-            Atendidos.add(eventoS.consulta);
         }
     }
 
@@ -168,43 +174,69 @@ public class Transacciones extends Modulo {
     void procesarRetiro(Simulacion s, Evento e) {
         boolean enCola = false;
         Iterator<Consulta> it = colaC.iterator();
+        if (e.consulta.tipoSentencia == Consulta.TipoSentencia.DDL) {
+            espera = false;
+        }
         while (it.hasNext()) {
             Consulta c = it.next();
             if (c == e.consulta) {
                 it.remove();
+                s.estadisticasT.promedioColaT += PQ.size();
                 e.consulta.tiempoEnsistema = e.tiempo - e.consulta.tiempoLlegada;
                 e.consulta.tiempoSalida = e.tiempo;
                 e.consulta.estadistTransacciones.tiempoSalidaCola = e.tiempo - e.consulta.estadistTransacciones.tiempoLlegadaModulo;
                 enCola = true;
             }
         }
-        if (!enCola && !PQ.isEmpty()) {
-            Consulta consulta = PQ.remove();
-            if (consulta.tipoSentencia == Consulta.TipoSentencia.DDL) {
-                espera = true;
-            }
-            double tiempoTotal = numMaxServidores * 0.03;
-            switch (consulta.tipoSentencia) {
-                case JOIN:
-                    consulta.bloquesCargados = (int) generador.GenerarValUniforme(1, 64);
-                    tiempoTotal += e.consulta.bloquesCargados * 0.1;
-                    break;
-                case SELECT:
-                    consulta.bloquesCargados = 1;
-                    tiempoTotal += 0.1;
-                    break;
-            }
-            consulta.estadistTransacciones.tiempoSalidaCola = e.tiempo - e.consulta.estadistTransacciones.tiempoLlegadaModulo;
-            Evento eventoS = new Evento(e.consulta);
-            eventoS.tipoE = Evento.TipoEvento.SALIDA;
-            eventoS.modulo = Evento.TipoModulo.TRANSACCIONES;
-            eventoS.tiempo = e.tiempo + tiempoTotal;
-            s.listaE.add(eventoS);
+        if (!enCola) {
+            numServOcupados--;
             Atendidos.remove(e.consulta);
-        } else if (!enCola) {
-            s.moduloT.numServOcupados--;
+        }
+        if (!enCola && !PQ.isEmpty()) {
+            Consulta consulta = PQ.peek();
+            if (consulta.tipoSentencia == Consulta.TipoSentencia.DDL) {
+                if ((numServOcupados) == 0) {
+                    double tiempoTotal = numMaxServidores * 0.03;
+                    consulta = PQ.remove();
+                    Evento eventoS = new Evento(consulta);
+                    eventoS.tipoE = e.tipoE.SALIDA;
+                    eventoS.modulo = e.modulo.TRANSACCIONES;
+                    s.listaE.add(eventoS);
+                    s.estadisticasT.promedioColaT += PQ.size();
+                    eventoS.tiempo = e.tiempo + tiempoTotal;
+                    Atendidos.add(e.consulta);
+                    numServOcupados++;
+                }
+                espera = true;
+            } else {
+                while (!PQ.isEmpty() && (numServOcupados < numMaxServidores)) {
+                    double tiempoTotal = numMaxServidores * 0.03;
+                    consulta = PQ.remove();
+                    Evento eventoS = new Evento(consulta);
+                    eventoS.tipoE = e.tipoE.SALIDA;
+                    eventoS.modulo = e.modulo.TRANSACCIONES;
+                    switch (consulta.tipoSentencia) {
+                        case JOIN:
+                            consulta.bloquesCargados = (int) generador.GenerarValUniforme(1, 64);
+                            tiempoTotal += e.consulta.bloquesCargados * 0.1;
+                            break;
+                        case SELECT:
+                            consulta.bloquesCargados = 1;
+                            tiempoTotal += 0.1;
+                            break;
+                    }
+                    consulta.estadistTransacciones.tiempoSalidaCola = e.tiempo - e.consulta.estadistTransacciones.tiempoLlegadaModulo;
+                    eventoS.tiempo = e.tiempo + tiempoTotal;
+                    numServOcupados++;
+                }
+            }
             Atendidos.remove(e.consulta);
         }
         e.consulta.enSistema = false;
+    }
+
+    @Override
+    int Colasize() {
+        return PQ.size();
     }
 }

@@ -43,5 +43,9 @@ public abstract class Modulo {
             System.out.print(c.id + ", ");
         }
     }
+    
+    int Colasize() {
+        return 0;
+    }
 
 }

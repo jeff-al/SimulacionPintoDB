@@ -18,6 +18,7 @@ public class AdministracionProcesos extends Modulo {
             e.consulta.moduloActual = Evento.TipoModulo.ADM_PROCESOS;
             if (numServOcupados == numMaxServidores) { //Si ya hay una consulta siendo procesada
                 colaC.add(e.consulta);
+                s.estadisticasT.promedioColaAP += colaC.size();
             } else {                                   //Si no hay una consulta en cola
                 double tiempoHilo = generador.GenerarValNormal(varianzaHilo, mediaHilo);
                 e.consulta.estadistAdm_Procesos.tiempoSalidaCola = 0;
@@ -51,6 +52,7 @@ public class AdministracionProcesos extends Modulo {
 
         if (!colaC.isEmpty()) {   //Si despues de una salida hay algo en cola
             Consulta consulta = colaC.remove();
+            s.estadisticasT.promedioColaAP += colaC.size();
             double tiempoHilo = generador.GenerarValNormal(varianzaHilo, mediaHilo);
             consulta.estadistAdm_Procesos.tiempoSalidaCola = e.tiempo - consulta.estadistAdm_Procesos.tiempoLlegadaModulo;
             Evento eventoS = new Evento(consulta);
@@ -71,6 +73,7 @@ public class AdministracionProcesos extends Modulo {
             Consulta c = it.next();
             if (c == e.consulta) {
                 it.remove();
+                s.estadisticasT.promedioColaAP += colaC.size();
                 e.consulta.tiempoEnsistema = e.tiempo - e.consulta.tiempoLlegada;
                 e.consulta.tiempoSalida = e.tiempo;
                 e.consulta.estadistAdm_Procesos.tiempoSalidaCola = e.tiempo - e.consulta.estadistAdm_Procesos.tiempoLlegadaModulo;
@@ -79,6 +82,7 @@ public class AdministracionProcesos extends Modulo {
         }
         if (!enCola && !colaC.isEmpty()) {
             Consulta consulta = colaC.remove();
+            s.estadisticasT.promedioColaAP += colaC.size();
             double tiempoHilo = generador.GenerarValNormal(varianzaHilo, mediaHilo);
             consulta.estadistAdm_Procesos.tiempoSalidaCola = e.tiempo - consulta.estadistAdm_Procesos.tiempoLlegadaModulo;
             Evento eventoS = new Evento(consulta);
@@ -88,7 +92,8 @@ public class AdministracionProcesos extends Modulo {
             s.listaE.add(eventoS);
             numServOcupados = 1;
             Atendidos.remove(e.consulta);
-        } else if (!enCola) {
+        } 
+        if (!enCola) {
             numServOcupados = 0;
             Atendidos.remove(e.consulta);
         }

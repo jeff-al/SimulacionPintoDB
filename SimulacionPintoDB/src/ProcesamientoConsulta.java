@@ -13,6 +13,7 @@ public class ProcesamientoConsulta extends Modulo {
         e.consulta.moduloActual = Evento.TipoModulo.PROC_CONSULTAS;
         if (numServOcupados == numMaxServidores) { //Si ya hay una consulta siendo procesada
             colaC.add(e.consulta);
+            s.estadisticasT.promedioColaPC += colaC.size();
         } else {                       //Si no hay una consulta en cola
             double tiempoProc = procesamiento(e.consulta);
             e.consulta.estadistProc_Consultas.tiempoSalidaCola = 0;
@@ -41,7 +42,8 @@ public class ProcesamientoConsulta extends Modulo {
         Atendidos.remove(e.consulta);
         if (!colaC.isEmpty()) {   //Si despues de una salida hay algo en cola
             Consulta consulta = colaC.remove();
-            double tiempoProc = procesamiento(e.consulta);
+            s.estadisticasT.promedioColaPC += colaC.size();
+            double tiempoProc = procesamiento(consulta);
             consulta.estadistProc_Consultas.tiempoSalidaCola = e.tiempo - consulta.estadistProc_Consultas.tiempoLlegadaModulo;
             Evento eventoS = new Evento(consulta);
             eventoS.tipoE = e.tipoE.SALIDA;
@@ -49,7 +51,7 @@ public class ProcesamientoConsulta extends Modulo {
             eventoS.tiempo = e.tiempo + tiempoProc;
             s.listaE.add(eventoS);
             numServOcupados++;
-            
+
             Atendidos.add(eventoS.consulta);
         }
     }
@@ -70,31 +72,35 @@ public class ProcesamientoConsulta extends Modulo {
     @Override
     void procesarRetiro(Simulacion s, Evento e) {
         boolean enCola = false;
-            Iterator<Consulta> it = s.moduloPC.colaC.iterator();
-            while (it.hasNext()) {
-                Consulta c = it.next();
-                if (c == e.consulta) { //Lo busca en la cola
-                    it.remove();
-                    e.consulta.tiempoEnsistema = e.tiempo - e.consulta.tiempoLlegada;
-                    e.consulta.tiempoSalida = e.tiempo;
-                    e.consulta.estadistProc_Consultas.tiempoSalidaCola = e.tiempo - e.consulta.estadistProc_Consultas.tiempoLlegadaModulo;
-                    enCola = true;
-                }
+        Iterator<Consulta> it = s.moduloPC.colaC.iterator();
+        while (it.hasNext()) {
+            Consulta c = it.next();
+            if (c == e.consulta) { //Lo busca en la cola
+                it.remove();
+                s.estadisticasT.promedioColaPC += colaC.size();
+                e.consulta.tiempoEnsistema = e.tiempo - e.consulta.tiempoLlegada;
+                e.consulta.tiempoSalida = e.tiempo;
+                e.consulta.estadistProc_Consultas.tiempoSalidaCola = e.tiempo - e.consulta.estadistProc_Consultas.tiempoLlegadaModulo;
+                enCola = true;
             }
-            if (!enCola && !colaC.isEmpty()) {
-                Consulta consulta = colaC.remove();
-                double tiempoProc = procesamiento(e.consulta);
-                consulta.estadistProc_Consultas.tiempoSalidaCola = e.tiempo - consulta.estadistProc_Consultas.tiempoLlegadaModulo;
-                Evento eventoS = new Evento(consulta);
-                eventoS.tipoE = e.tipoE.SALIDA;
-                eventoS.modulo = e.modulo.PROC_CONSULTAS;
-                eventoS.tiempo = e.tiempo + tiempoProc;
-                s.listaE.add(eventoS);
-                Atendidos.remove(e.consulta);
-            }else if(!enCola){
-                numServOcupados--;
-                Atendidos.remove(e.consulta);
-            }
-            e.consulta.enSistema = false;
+        }
+        if (!enCola && !colaC.isEmpty()) {
+            Consulta consulta = colaC.remove();
+            s.estadisticasT.promedioColaPC += colaC.size();
+            double tiempoProc = procesamiento(e.consulta);
+            consulta.estadistProc_Consultas.tiempoSalidaCola = e.tiempo - consulta.estadistProc_Consultas.tiempoLlegadaModulo;
+            Evento eventoS = new Evento(consulta);
+            eventoS.tipoE = e.tipoE.SALIDA;
+            eventoS.modulo = e.modulo.PROC_CONSULTAS;
+            eventoS.tiempo = e.tiempo + tiempoProc;
+            s.listaE.add(eventoS);
+            Atendidos.remove(e.consulta);
+            numServOcupados++;
+        }
+        if (!enCola) {
+            numServOcupados--;
+            Atendidos.remove(e.consulta);
+        }
+        e.consulta.enSistema = false;
     }
 }
