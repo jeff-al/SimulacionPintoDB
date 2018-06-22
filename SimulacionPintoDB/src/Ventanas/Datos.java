@@ -48,6 +48,8 @@ public class Datos extends javax.swing.JFrame {
         txt_T = new javax.swing.JTextField();
         botonContinuar = new javax.swing.JButton();
         jC_ModoLento = new javax.swing.JCheckBox();
+        jLabel1 = new javax.swing.JLabel();
+        txt_N = new javax.swing.JTextField();
         jLabelFondo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -73,7 +75,7 @@ public class Datos extends javax.swing.JFrame {
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(240, 240, 240));
-        jLabel3.setText("Maximo de sentenicas para ejecutar (m):");
+        jLabel3.setText("Maximo servidores Ejecucion de Sentecnias (m):");
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 340, 310, -1));
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -89,17 +91,17 @@ public class Datos extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(240, 240, 240));
         jLabel6.setText("Maximo conexiones perimtidas (k):");
-        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 220, 310, -1));
+        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 260, 310, -1));
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(240, 240, 240));
         jLabel7.setText("Tiempo maximo por conexion (t):");
-        getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 260, 310, -1));
+        getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 220, 310, -1));
 
         jLabel8.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(240, 240, 240));
         jLabel8.setText("Maximo de procesos disponibles (p):");
-        getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 300, 310, -1));
+        getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 380, 310, -1));
 
         txt_M.setBackground(new java.awt.Color(51, 51, 51));
         txt_M.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
@@ -109,7 +111,7 @@ public class Datos extends javax.swing.JFrame {
                 txt_MActionPerformed(evt);
             }
         });
-        getContentPane().add(txt_M, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 340, 50, -1));
+        getContentPane().add(txt_M, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 340, 50, -1));
 
         txt_Iter.setBackground(new java.awt.Color(51, 51, 51));
         txt_Iter.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
@@ -119,7 +121,7 @@ public class Datos extends javax.swing.JFrame {
                 txt_IterActionPerformed(evt);
             }
         });
-        getContentPane().add(txt_Iter, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 140, 50, -1));
+        getContentPane().add(txt_Iter, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 140, 50, -1));
 
         txt_Tiempo.setBackground(new java.awt.Color(51, 51, 51));
         txt_Tiempo.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
@@ -129,22 +131,22 @@ public class Datos extends javax.swing.JFrame {
                 txt_TiempoActionPerformed(evt);
             }
         });
-        getContentPane().add(txt_Tiempo, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 180, 50, -1));
+        getContentPane().add(txt_Tiempo, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 180, 50, -1));
 
         txt_K.setBackground(new java.awt.Color(51, 51, 51));
         txt_K.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         txt_K.setForeground(new java.awt.Color(240, 240, 240));
-        getContentPane().add(txt_K, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 220, 50, -1));
+        getContentPane().add(txt_K, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 260, 50, -1));
 
         txt_P.setBackground(new java.awt.Color(51, 51, 51));
         txt_P.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         txt_P.setForeground(new java.awt.Color(240, 240, 240));
-        getContentPane().add(txt_P, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 300, 50, -1));
+        getContentPane().add(txt_P, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 380, 50, -1));
 
         txt_T.setBackground(new java.awt.Color(51, 51, 51));
         txt_T.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         txt_T.setForeground(new java.awt.Color(240, 240, 240));
-        getContentPane().add(txt_T, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 260, 50, -1));
+        getContentPane().add(txt_T, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 220, 50, -1));
 
         botonContinuar.setBackground(new java.awt.Color(0, 153, 153));
         botonContinuar.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
@@ -155,12 +157,21 @@ public class Datos extends javax.swing.JFrame {
                 botonContinuarActionPerformed(evt);
             }
         });
-        getContentPane().add(botonContinuar, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 480, 110, 30));
+        getContentPane().add(botonContinuar, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 500, 110, 30));
 
         jC_ModoLento.setBackground(new java.awt.Color(0, 153, 153));
         jC_ModoLento.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jC_ModoLento.setText("Modo Lento");
-        getContentPane().add(jC_ModoLento, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 400, 100, -1));
+        getContentPane().add(jC_ModoLento, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 430, 100, -1));
+
+        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(240, 240, 240));
+        jLabel1.setText("Maximo servidores Procesamiento de consultas (n):");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 300, 320, -1));
+
+        txt_N.setBackground(new java.awt.Color(51, 51, 51));
+        txt_N.setForeground(new java.awt.Color(240, 240, 240));
+        getContentPane().add(txt_N, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 300, 50, -1));
 
         jLabelFondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/Fondo.jpg"))); // NOI18N
         getContentPane().add(jLabelFondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 610, 620));
@@ -180,7 +191,8 @@ public class Datos extends javax.swing.JFrame {
         Interfaz.t = Interfaz.datos.getT();
         Interfaz.k = Interfaz.datos.getK();
         Interfaz.m = Interfaz.datos.getM();
-        Interfaz.p = Interfaz.datos.getM();
+        Interfaz.p = Interfaz.datos.getP();
+        Interfaz.n = Interfaz.datos.getN();
         Interfaz.v3 = true;
         Interfaz.modoLento = jC_ModoLento.isSelected();
         Interfaz.corr.setVisible(true);
@@ -231,6 +243,14 @@ public class Datos extends javax.swing.JFrame {
         return resultado;
     }
     
+    public int getN(){
+        String texto = txt_N.getText();
+        int resultado = 0;
+        Scanner s = new Scanner(texto);
+        resultado += s.nextInt();
+        return resultado;
+    }
+    
     public int getP(){
         String texto = txt_P.getText();
         int resultado = 0;
@@ -256,6 +276,7 @@ public class Datos extends javax.swing.JFrame {
     private javax.swing.JButton BotonSalir;
     private javax.swing.JButton botonContinuar;
     private javax.swing.JCheckBox jC_ModoLento;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -267,6 +288,7 @@ public class Datos extends javax.swing.JFrame {
     private javax.swing.JTextField txt_Iter;
     private javax.swing.JTextField txt_K;
     private javax.swing.JTextField txt_M;
+    private javax.swing.JTextField txt_N;
     private javax.swing.JTextField txt_P;
     private javax.swing.JTextField txt_T;
     private javax.swing.JTextField txt_Tiempo;

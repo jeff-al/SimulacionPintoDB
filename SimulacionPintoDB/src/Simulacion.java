@@ -9,7 +9,7 @@ public class Simulacion extends Thread {
     List<Consulta> listaC = new ArrayList();
     List<Evento> listaE = new ArrayList();
 
-    int n = 2; //ProcesosDisponibles
+    int n; //ProcesosDisponibles
     int p; //MaximoConsultas
     int m; //MaximoSentencias
     int c;
@@ -44,6 +44,7 @@ public class Simulacion extends Thread {
         c = interfaz.k;
         p = interfaz.p;
         m = interfaz.m;
+        n = interfaz.n;
         moduloAC = new AdministracionConexiones(c);
         moduloAP = new AdministracionProcesos();
         moduloPC = new ProcesamientoConsulta(n);

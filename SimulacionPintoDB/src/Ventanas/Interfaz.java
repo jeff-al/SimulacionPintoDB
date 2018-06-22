@@ -19,6 +19,7 @@ public class Interfaz{
     public static int k;
     public static int p;
     public static int m;
+    public static int n;
     public static boolean seguir;
     public static boolean v3;
     public static boolean modoLento;
@@ -36,6 +37,7 @@ public class Interfaz{
         k = 1;
         p = 1;
         m = 1;
+        n = 1;
     }
     
     //@Override
