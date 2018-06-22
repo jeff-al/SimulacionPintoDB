@@ -90,7 +90,7 @@ public class Simulacion extends Thread {
                             moduloAC.numServOcupados--;
                             break;
                     }
-                    interfaz.corr.impDurante("SALIO: " + evento.consulta.id + "  -------  ");
+                    interfaz.corr.impDurante("SALIO: " + evento.consulta.id + "  -------  "+"Mod Actual: "+evento.consulta.moduloActual);
                 } else {
                     interfaz.corr.impDurante("ID Consulta: " + evento.consulta.id + "  -------  Tipo de Sentencia: " + evento.consulta.tipoSentencia + "  -------  Modulo: " + evento.modulo + "  -------  Evento: " + evento.tipoE + "\n");
                     //System.out.println("Reloj: " + reloj + " ID: " + evento.consulta.id + " Sentencia: " + evento.consulta.tipoSentencia + " Modulo: " + evento.modulo + " Evento: " + evento.tipoE);
@@ -136,6 +136,7 @@ public class Simulacion extends Thread {
                 imprimir();
             }
         }
+        estadisticasT.promediarVidaConexión(listaC);
         estadisticasT.promediarCola(listaC);
         System.out.println("Descartadas: " + estadisticasT.conexionesDescartadas);
         System.out.println("Totales: " + ids);
@@ -222,28 +223,7 @@ public class Simulacion extends Thread {
 
         interfaz.corr.impDurante("Modulo AC  Conexiones Actuales : " + moduloAC.numServOcupados + "/" + moduloAC.numMaxServidores + "  " + tiempoMaximo);
         interfaz.corr.impDurante("\n\n\n");
-        /*
-        System.out.print("AP ");
-        moduloAP.imprimirAtend();
-        System.out.print("     -------------    ");
-        moduloAP.imprimirCola();
-        System.out.print("PC ");
-        moduloPC.imprimirAtend();
-        System.out.print("     -------------    ");
-        moduloPC.imprimirCola();
-        System.out.print("TR ");
-        moduloT.imprimirAtend();
-        System.out.print("     -------------    ");
-        moduloT.imprimirCola();
-        System.out.print("ES ");
-        moduloES.imprimirAtend();
-        System.out.print("     -------------    ");
-        moduloES.imprimirCola();
-        System.out.print("AC ");
-        moduloAC.imprimirAtend();
-        System.out.print("     -------------    ");
-        moduloAC.imprimirCola();
-         */
+        
     }
 
     public static void main(String[] args) {
