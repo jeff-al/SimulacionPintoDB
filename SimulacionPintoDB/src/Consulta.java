@@ -8,7 +8,7 @@ public class Consulta {
     int id;
     TipoSentencia tipoSentencia;
     boolean soloLectura;
-    int bloquesCargados;
+    int bloquesCargados = 0;
     double tiempoLlegada;
     double tiempoSalida;
     double tiempoEnsistema;

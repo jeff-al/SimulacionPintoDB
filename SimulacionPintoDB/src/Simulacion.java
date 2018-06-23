@@ -4,15 +4,15 @@ import java.util.*;
 public class Simulacion extends Thread {
 
     int ids = 0;
-    double tiempoMaximo;
+    double tiempoMaximoConexion;
     double tiempoM;
     List<Consulta> listaC = new ArrayList();
     List<Evento> listaE = new ArrayList();
 
-    int n; //ProcesosDisponibles
-    int p; //MaximoConsultas
-    int m; //MaximoSentencias
-    int c;
+    int n;  //ProcesosDisponibles
+    int p;  //MaximoConsultas
+    int m;  //MaximoSentencias
+    int k;  //Conexiones maximas Modulo Administracion de Conexiones
 
     Modulo moduloAC;
     Modulo moduloAP;
@@ -40,12 +40,12 @@ public class Simulacion extends Thread {
             }
         }
         tiempoM = interfaz.tM;
-        tiempoMaximo = interfaz.t;
-        c = interfaz.k;
+        tiempoMaximoConexion = interfaz.t;
+        k = interfaz.k;
         p = interfaz.p;
         m = interfaz.m;
         n = interfaz.n;
-        moduloAC = new AdministracionConexiones(c);
+        moduloAC = new AdministracionConexiones(k);
         moduloAP = new AdministracionProcesos();
         moduloPC = new ProcesamientoConsulta(n);
         moduloT = new Transacciones(p);
@@ -90,7 +90,7 @@ public class Simulacion extends Thread {
                             moduloAC.numServOcupados--;
                             break;
                     }
-                    interfaz.corr.impDurante("SALIO: " + evento.consulta.id + "  -------  "+"Mod Actual: "+evento.consulta.moduloActual);
+                    interfaz.corr.impDurante("SALIO: " + evento.consulta.id + "  -------  " + "Mod Actual: " + evento.consulta.moduloActual + "Tipo: "+evento.consulta.tipoSentencia+"  " );
                 } else {
                     interfaz.corr.impDurante("ID Consulta: " + evento.consulta.id + "  -------  Tipo de Sentencia: " + evento.consulta.tipoSentencia + "  -------  Modulo: " + evento.modulo + "  -------  Evento: " + evento.tipoE + "\n");
                     //System.out.println("Reloj: " + reloj + " ID: " + evento.consulta.id + " Sentencia: " + evento.consulta.tipoSentencia + " Modulo: " + evento.modulo + " Evento: " + evento.tipoE);
@@ -163,33 +163,28 @@ public class Simulacion extends Thread {
             consulta.tipoSentencia = consulta.tipoSentencia.DDL;
             consulta.soloLectura = false;
         }
-        consulta.estadistAdm_Conexiones.tiempoLlegadaModulo = reloj;  //Se puede eliminar todo
-        consulta.estadistAdm_Conexiones.tiempoSalidaModulo = reloj;
-        consulta.estadistAdm_Conexiones.tiempoSalidaCola = 0;
-        consulta.estadistAdm_Conexiones.tiempoEnModulo = 0; // Asumiendo que dura algo en el modulo
-        Evento evento = new Evento(consulta);
+        Evento evento = new Evento(consulta);                     //Evento de entrada al administrador de procesos
         evento.tipoE = Evento.TipoEvento.ENTRADA;
-        evento.modulo = evento.modulo.ADM_PROCESOS;
+        evento.modulo = Evento.TipoModulo.ADM_PROCESOS;
 
-        Evento eventoTO = new Evento(consulta);
+        Evento eventoTO = new Evento(consulta);                  //Evento de TimeOut
         eventoTO.tipoE = Evento.TipoEvento.RETIRO;
+
         if (inicial) {
             evento.tiempo = 0;
-            consulta.tiempoLlegada = reloj;
-            eventoTO.tiempo = reloj + tiempoMaximo;
             inicial = false;
         } else {
             evento.tiempo = reloj + generador.GenerarValExponencial(0.5);
-            consulta.tiempoLlegada = evento.tiempo;
-            eventoTO.tiempo = evento.tiempo + tiempoMaximo;
         }
-        evento.consulta.bloquesCargados = 0;
-        listaE.add(evento);
+        consulta.tiempoLlegada = evento.tiempo;
+        eventoTO.tiempo = evento.tiempo + tiempoMaximoConexion;
+        
+        listaE.add(evento);                    //Se añaden los eventos a la lista de eventos
         listaE.add(eventoTO);
-        listaC.add(consulta);
+        listaC.add(consulta);                  //Se añade la consulta generada a la lista de consultas
     }
 
-    Evento buscarMenor(List<Evento> lista) {
+    Evento buscarMenor(List<Evento> lista) { 
         double tiempo = 1000000000;
         int index = 0;
         for (int i = 0; i < lista.size(); i++) {
@@ -221,9 +216,9 @@ public class Simulacion extends Thread {
         interfaz.corr.impDurante("Modulo ES  Serv Ocupados : " + moduloES.numServOcupados + "/" + moduloES.numMaxServidores);
         interfaz.corr.impDurante("   Cola en modulo: " + moduloES.colaC.size() + "\n");
 
-        interfaz.corr.impDurante("Modulo AC  Conexiones Actuales : " + moduloAC.numServOcupados + "/" + moduloAC.numMaxServidores + "  " + tiempoMaximo);
+        interfaz.corr.impDurante("Modulo AC  Conexiones Actuales : " + moduloAC.numServOcupados + "/" + moduloAC.numMaxServidores + "  " + tiempoMaximoConexion);
         interfaz.corr.impDurante("\n\n\n");
-        
+
     }
 
     public static void main(String[] args) {

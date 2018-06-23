@@ -3,104 +3,101 @@ import java.util.Iterator;
 
 public class ProcesamientoConsulta extends Modulo {
 
-    ProcesamientoConsulta(int NumeroServ) {
-        numMaxServidores = NumeroServ;
+    double tiempoProcesamiento;
+
+    ProcesamientoConsulta(int ProcesosDisponibles) {
+        numMaxServidores = ProcesosDisponibles;
     }
 
     @Override
     void procesarEntrada(Simulacion s, Evento e) {
         e.consulta.estadistProc_Consultas.tiempoLlegadaModulo = e.tiempo;
         e.consulta.moduloActual = Evento.TipoModulo.PROC_CONSULTAS;
-        if (numServOcupados == numMaxServidores) { //Si ya hay una consulta siendo procesada
+        if (numServOcupados == numMaxServidores) { //Si ya todos los procesos están ocupados
             colaC.add(e.consulta);
             s.estadisticasT.promedioColaPC += colaC.size();
-        } else {                       //Si no hay una consulta en cola
-            double tiempoProc = procesamiento(e.consulta);
+        } else {                              //Si hay procesos libres
             e.consulta.estadistProc_Consultas.tiempoSalidaCola = 0;
             Evento evento = new Evento(e.consulta);
-            evento.tipoE = e.tipoE.SALIDA;
-            evento.modulo = e.modulo.PROC_CONSULTAS;
-            evento.tiempo = e.tiempo + tiempoProc;
+            evento.tipoE = Evento.TipoEvento.SALIDA;
+            evento.modulo = Evento.TipoModulo.PROC_CONSULTAS;
+            procesamiento(e.consulta);                // Se procesa la consulta
+            evento.tiempo = e.tiempo + tiempoProcesamiento;
             s.listaE.add(evento);
             numServOcupados++;
-            Atendidos.add(e.consulta);
         }
 
     }
 
     @Override
     void procesarSalida(Simulacion s, Evento e) {
-
         e.consulta.estadistProc_Consultas.tiempoSalidaModulo = e.tiempo;
         e.consulta.estadistProc_Consultas.tiempoEnModulo = e.tiempo - e.consulta.estadistProc_Consultas.tiempoLlegadaModulo;
         Evento evento = new Evento(e.consulta);
-        evento.tipoE = e.tipoE.ENTRADA;
-        evento.modulo = e.modulo.TRANSACCIONES;
+        evento.tipoE = Evento.TipoEvento.ENTRADA;
+        evento.modulo = Evento.TipoModulo.TRANSACCIONES;
         evento.tiempo = e.tiempo;
         numServOcupados--;
         s.listaE.add(evento);
-        Atendidos.remove(e.consulta);
+
         if (!colaC.isEmpty()) {   //Si despues de una salida hay algo en cola
             Consulta consulta = colaC.remove();
-            s.estadisticasT.promedioColaPC += colaC.size();
-            double tiempoProc = procesamiento(consulta);
             consulta.estadistProc_Consultas.tiempoSalidaCola = e.tiempo - consulta.estadistProc_Consultas.tiempoLlegadaModulo;
+            s.estadisticasT.promedioColaPC += colaC.size();
             Evento eventoS = new Evento(consulta);
             eventoS.tipoE = e.tipoE.SALIDA;
             eventoS.modulo = e.modulo.PROC_CONSULTAS;
-            eventoS.tiempo = e.tiempo + tiempoProc;
+            procesamiento(consulta);        //Se procesa la consulta
+            eventoS.tiempo = e.tiempo + tiempoProcesamiento;
             s.listaE.add(eventoS);
             numServOcupados++;
-
-            Atendidos.add(eventoS.consulta);
         }
-    }
 
-    double procesamiento(Consulta c) {
-        double result = 0.1;
-        result += generador.GenerarValUniforme(0, 1);
-        result += generador.GenerarValUniforme(0, 2);
-        result += generador.GenerarValExponencial(0.7);
-        if (c.soloLectura == true) {
-            result += 0.1;
-        } else {
-            result += 0.25;
-        }
-        return result;
     }
 
     @Override
     void procesarRetiro(Simulacion s, Evento e) {
-        boolean enCola = false;
+        boolean enCola = false;                             //Booleano para saber si se sacó o no de la cola
         Iterator<Consulta> it = s.moduloPC.colaC.iterator();
-        while (it.hasNext()) {
+        while (it.hasNext()) {                      //Se busca en la cola
             Consulta c = it.next();
-            if (c == e.consulta) { //Lo busca en la cola
+            if (c == e.consulta) {             //Si lo encuentra lo saca y se ponen los tiempos de salidas para las estadisticas
                 it.remove();
                 s.estadisticasT.promedioColaPC += colaC.size();
                 e.consulta.tiempoEnsistema = e.tiempo - e.consulta.tiempoLlegada;
-                e.consulta.tiempoSalida = e.tiempo;
                 e.consulta.estadistProc_Consultas.tiempoSalidaCola = e.tiempo - e.consulta.estadistProc_Consultas.tiempoLlegadaModulo;
                 enCola = true;
             }
         }
-        if (!enCola && !colaC.isEmpty()) {
-            Consulta consulta = colaC.remove();
-            s.estadisticasT.promedioColaPC += colaC.size();
-            double tiempoProc = procesamiento(e.consulta);
+        if (!enCola && !colaC.isEmpty()) {                        //Si estaba siendo atendido y hay consultas en cola
+            Consulta consulta = colaC.remove();                   //Se saca una colsulta de la cola para ser atendida
             consulta.estadistProc_Consultas.tiempoSalidaCola = e.tiempo - consulta.estadistProc_Consultas.tiempoLlegadaModulo;
+            s.estadisticasT.promedioColaPC += colaC.size();
             Evento eventoS = new Evento(consulta);
-            eventoS.tipoE = e.tipoE.SALIDA;
-            eventoS.modulo = e.modulo.PROC_CONSULTAS;
-            eventoS.tiempo = e.tiempo + tiempoProc;
+            eventoS.tipoE = Evento.TipoEvento.SALIDA;
+            eventoS.modulo = Evento.TipoModulo.PROC_CONSULTAS;
+            procesamiento(consulta);                               //Se procesa la consulta 
+            eventoS.tiempo = e.tiempo + tiempoProcesamiento;
             s.listaE.add(eventoS);
-            Atendidos.remove(e.consulta);
             numServOcupados++;
-        }
-        if (!enCola) {
+        } else if (!enCola) {                         //Si estaba siendo atendido y no habia nadie en cola
             numServOcupados--;
-            Atendidos.remove(e.consulta);
         }
-        e.consulta.enSistema = false;
+        e.consulta.tiempoSalida = e.tiempo;
+        e.consulta.estadistProc_Consultas.tiempoSalidaModulo = e.tiempo;
+        e.consulta.estadistProc_Consultas.tiempoEnModulo = e.tiempo - e.consulta.estadistProc_Consultas.tiempoLlegadaModulo;
+        e.consulta.enSistema = false;                //Se pone a la consulta como fuera del sistema
+    }
+
+    void procesamiento(Consulta c) {
+        tiempoProcesamiento = 0.1;         //Tiempo de validacion lexica
+        tiempoProcesamiento += generador.GenerarValUniforme(0, 1);   //Tiempo de validacion sintactica
+        tiempoProcesamiento += generador.GenerarValUniforme(0, 2);    //Tiempo de validacion semantica
+        tiempoProcesamiento += generador.GenerarValExponencial(0.7);   //Verificacion de permisos
+        if (c.soloLectura == true) {                                   //Optimizacion de consulta
+            tiempoProcesamiento += 0.1;
+        } else {
+            tiempoProcesamiento += 0.25;
+        }
     }
 }

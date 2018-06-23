@@ -3,6 +3,8 @@ import java.util.Iterator;
 
 public class EjecucionDeSentencias extends Modulo {
 
+    double tiempoEjecucion;
+
     EjecucionDeSentencias(int MaxSentencias) {
         numMaxServidores = MaxSentencias;
     }
@@ -11,112 +13,92 @@ public class EjecucionDeSentencias extends Modulo {
     void procesarEntrada(Simulacion s, Evento e) {
         e.consulta.estadistEjec_Sentencias.tiempoLlegadaModulo = e.tiempo;
         e.consulta.moduloActual = Evento.TipoModulo.EJEC_SENTENCIAS;
-        if (numServOcupados == numMaxServidores) { //Si ya hay una consulta siendo procesada
+        if (numServOcupados == numMaxServidores) { //Si todos los "Servidores" estan ocupados se añade a la cola
             colaC.add(e.consulta);
             s.estadisticasT.promedioColaES += colaC.size();
-        } else {                       //Si no hay una consulta en cola
-            double tiempoEjec = Math.pow(e.consulta.bloquesCargados, 2) * (1 / 1000); //Milisegundos a segundos
-            switch (e.consulta.tipoSentencia) {
-                case DDL:
-                    e.consulta.bloquesCargados = (int) generador.GenerarValUniforme(1, 64);
-                    tiempoEjec += 0.5;
-                    break;
-                case UPDATE:
-                    e.consulta.bloquesCargados = 1;
-                    tiempoEjec += 1;
-                    break;
-            }
+        } else {                       //Si hay "Servidores" disponibles se procesa
             e.consulta.estadistEjec_Sentencias.tiempoSalidaCola = 0;
             Evento evento = new Evento(e.consulta);
-            evento.tipoE = e.tipoE.SALIDA;
-            evento.modulo = e.modulo.EJEC_SENTENCIAS;
-            evento.tiempo = e.tiempo + tiempoEjec;
+            evento.tipoE = Evento.TipoEvento.SALIDA;
+            evento.modulo = Evento.TipoModulo.EJEC_SENTENCIAS;
+            ejecucionSentencia(e.consulta);
+            evento.tiempo = e.tiempo + tiempoEjecucion;
             s.listaE.add(evento);
             numServOcupados++;
-            Atendidos.add(e.consulta);
         }
     }
 
     @Override
-    void procesarSalida(Simulacion s, Evento e) {
-        e.consulta.tiempoSalida = e.tiempo;
+    void procesarSalida(Simulacion s, Evento e) {   //Se ponen los tiempos de la salida
         e.consulta.estadistEjec_Sentencias.tiempoSalidaModulo = e.tiempo;
         e.consulta.estadistEjec_Sentencias.tiempoEnModulo = e.tiempo - e.consulta.estadistEjec_Sentencias.tiempoLlegadaModulo;
         Evento evento = new Evento(e.consulta);
-        evento.tipoE = e.tipoE.ENTRADA;
-        evento.modulo = e.modulo.ADM_CONEXIONES;
+        evento.tipoE = Evento.TipoEvento.ENTRADA;
+        evento.modulo = Evento.TipoModulo.ADM_CONEXIONES;
         evento.tiempo = e.tiempo;
         numServOcupados--;
         s.listaE.add(evento);
-        Atendidos.remove(e.consulta);
+
         if (!colaC.isEmpty()) {   //Si despues de una salida hay algo en cola
             Consulta consulta = colaC.remove();
+            consulta.estadistEjec_Sentencias.tiempoSalidaCola = e.tiempo - consulta.estadistEjec_Sentencias.tiempoLlegadaModulo;
             s.estadisticasT.promedioColaES += colaC.size();
-            double tiempoEjec = Math.pow(consulta.bloquesCargados, 2) * (1 / 1000);
-            switch (e.consulta.tipoSentencia) {
-                case DDL:
-                    consulta.bloquesCargados = (int) generador.GenerarValUniforme(1, 64);
-                    tiempoEjec += 0.5;
-                    break;
-                case UPDATE:
-                    consulta.bloquesCargados = 1;
-                    tiempoEjec += 1;
-                    break;
-            }
-            consulta.estadistEjec_Sentencias.tiempoSalidaCola = e.tiempo - consulta.estadistAdm_Procesos.tiempoLlegadaModulo;
             Evento eventoS = new Evento(consulta);
-            eventoS.tipoE = e.tipoE.SALIDA;
-            eventoS.modulo = e.modulo.EJEC_SENTENCIAS;
-            eventoS.tiempo = e.tiempo + tiempoEjec;
+            eventoS.tipoE = Evento.TipoEvento.SALIDA;
+            eventoS.modulo = Evento.TipoModulo.EJEC_SENTENCIAS;
+            ejecucionSentencia(consulta);
+            eventoS.tiempo = e.tiempo + tiempoEjecucion;
             s.listaE.add(eventoS);
             numServOcupados++;
-
-            Atendidos.add(eventoS.consulta);
         }
+
     }
 
     @Override
     void procesarRetiro(Simulacion s, Evento e) {
-        boolean enCola = false;
-        Iterator<Consulta> it = s.moduloES.colaC.iterator();
-        while (it.hasNext()) {
+        boolean enCola = false;               //Booleano para saber si esta en cola
+        Iterator<Consulta> it = colaC.iterator();
+        while (it.hasNext()) {      //Lo buscamos en la cola
             Consulta c = it.next();
-            if (c == e.consulta) {
+            if (c == e.consulta) {    //Si esta lo quitamos y se ponen los tiempos de salida
                 it.remove();
                 s.estadisticasT.promedioColaES += colaC.size();
                 e.consulta.tiempoEnsistema = e.tiempo - e.consulta.tiempoLlegada;
-                e.consulta.tiempoSalida = e.tiempo;
                 e.consulta.estadistEjec_Sentencias.tiempoSalidaCola = e.tiempo - e.consulta.estadistEjec_Sentencias.tiempoLlegadaModulo;
                 enCola = true;
             }
         }
-        if (!enCola && !colaC.isEmpty()) {
+
+        if (!enCola && !colaC.isEmpty()) {       //Si está siendo atendido y la cola no está vacia se saca el siguiente de la cola y se le ponen los tiempos
             Consulta consulta = colaC.remove();
+            consulta.estadistEjec_Sentencias.tiempoSalidaCola = e.tiempo - consulta.estadistEjec_Sentencias.tiempoLlegadaModulo;
             s.estadisticasT.promedioColaES += colaC.size();
-            double tiempoEjec = Math.pow(consulta.bloquesCargados, 2) * (1 / 1000);
-            switch (consulta.tipoSentencia) {
-                case DDL:
-                    consulta.bloquesCargados = (int) generador.GenerarValUniforme(1, 64);
-                    tiempoEjec += 0.5;
-                    break;
-                case UPDATE:
-                    consulta.bloquesCargados = 1;
-                    tiempoEjec += 1;
-                    break;
-            }
-            consulta.estadistEjec_Sentencias.tiempoSalidaCola = e.tiempo - consulta.estadistAdm_Procesos.tiempoLlegadaModulo;
             Evento eventoS = new Evento(consulta);
-            eventoS.tipoE = e.tipoE.SALIDA;
-            eventoS.modulo = e.modulo.EJEC_SENTENCIAS;
-            eventoS.tiempo = e.tiempo + tiempoEjec;
+            eventoS.tipoE = Evento.TipoEvento.SALIDA;
+            eventoS.modulo = Evento.TipoModulo.EJEC_SENTENCIAS;
+            ejecucionSentencia(consulta);
+            eventoS.tiempo = e.tiempo + tiempoEjecucion;
             s.listaE.add(eventoS);
             numServOcupados++;
-            Atendidos.remove(e.consulta);
         }
         if (!enCola) {
             numServOcupados--;
-            Atendidos.remove(e.consulta);
         }
-        e.consulta.enSistema = false;
+        e.consulta.tiempoSalida = e.tiempo;
+        e.consulta.estadistEjec_Sentencias.tiempoSalidaModulo = e.tiempo;
+        e.consulta.estadistEjec_Sentencias.tiempoEnModulo = e.tiempo - e.consulta.estadistEjec_Sentencias.tiempoLlegadaModulo;
+        e.consulta.enSistema = false;      //Se pone la consulta como fuera del sistema
+    }
+
+    void ejecucionSentencia(Consulta consulta) {
+        tiempoEjecucion = Math.pow(consulta.bloquesCargados, 2) * (1 / 1000); //Milisegundos a segundos  (La ejecucion toma B a la 2 milisegundos en ejecutarse)
+        switch (consulta.tipoSentencia) {
+            case DDL:
+                tiempoEjecucion += 0.5;       //Actualizar el esquema de la base de datos
+                break;
+            case UPDATE:
+                tiempoEjecucion += 1;       //Actualizar el esquema de la base de datos
+                break;
+        }
     }
 }
