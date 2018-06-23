@@ -2,12 +2,13 @@
 import java.util.*;
 
 public class Simulacion extends Thread {
-
-    int ids = 0;
+    
+    static int iter = 1;
+    int ids;
     double tiempoMaximoConexion;
     double tiempoM;
-    List<Consulta> listaC = new ArrayList();
-    List<Evento> listaE = new ArrayList();
+    List<Consulta> listaC;
+    List<Evento> listaE;
 
     int n;  //ProcesosDisponibles
     int p;  //MaximoConsultas
@@ -20,25 +21,21 @@ public class Simulacion extends Thread {
     Modulo moduloT;
     Modulo moduloES;
 
-    Ventanas.Interfaz interfaz = new Ventanas.Interfaz();
+    static Ventanas.Interfaz interfaz = new Ventanas.Interfaz();
 
     GenValoresAleatorios generador = new GenValoresAleatorios();
-    EstadisticasTotales estadisticasT = new EstadisticasTotales();
+    
+    EstadisticasTotales estadisticasT;
 
-    private double reloj = 0;
+    private double reloj;
+    boolean inicial;
 
-    boolean inicial = true;
-
-    void Simular() {
-        interfaz.run();
-        boolean v3 = false;
-        while (!interfaz.v3) {
-            v3 = interfaz.datos.getV3();
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-            }
-        }
+    public Simulacion(){
+        inicial = true;
+        reloj = 0;
+        ids = 0;
+        listaC = new ArrayList();
+        listaE = new ArrayList();
         tiempoM = interfaz.tM;
         tiempoMaximoConexion = interfaz.t;
         k = interfaz.k;
@@ -50,6 +47,11 @@ public class Simulacion extends Thread {
         moduloPC = new ProcesamientoConsulta(n);
         moduloT = new Transacciones(p);
         moduloES = new EjecucionDeSentencias(m);
+        estadisticasT = new EstadisticasTotales();
+    }
+    
+    void Simular() {
+        interfaz.corr.impDurante("Inicia Corrida numero: "+iter+"\n\n");
         boolean pausa = false;
         crearEvento();
         while (reloj < tiempoM) {
@@ -63,7 +65,7 @@ public class Simulacion extends Thread {
             }
             if (interfaz.modoLento) {
                 try {
-                    Thread.sleep(1500);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                 }
             }
@@ -133,9 +135,11 @@ public class Simulacion extends Thread {
                             break;
                     }
                 }
-                imprimir();
+                imprimirD();
             }
         }
+        imprimirF();
+        /*
         estadisticasT.promediarVidaConexión(listaC);
         estadisticasT.promediarCola(listaC);
         System.out.println("Descartadas: " + estadisticasT.conexionesDescartadas);
@@ -144,6 +148,8 @@ public class Simulacion extends Thread {
         System.out.println("Tamaño Promedio de la cola PC: " + estadisticasT.promedioColaPC);
         System.out.println("Tamaño Promedio de la cola T: " + estadisticasT.promedioColaT);
         System.out.println("Tamaño Promedio de la cola ES: " + estadisticasT.promedioColaES);
+        */
+        
     }
 
     void crearEvento() {
@@ -200,7 +206,7 @@ public class Simulacion extends Thread {
         return lista.remove(index);
     }
 
-    void imprimir() {
+    void imprimirD() { // Impresiones durante cada corrida
         interfaz.corr.impReloj("" + String.format("%.2f", reloj) + " seg\n");
         interfaz.corr.impCD("" + estadisticasT.conexionesDescartadas + "\n");
         interfaz.corr.impDurante("Reloj: " + String.format("%.2f", reloj) + " seg\n");
@@ -216,13 +222,55 @@ public class Simulacion extends Thread {
         interfaz.corr.impDurante("Modulo ES  Serv Ocupados : " + moduloES.numServOcupados + "/" + moduloES.numMaxServidores);
         interfaz.corr.impDurante("   Cola en modulo: " + moduloES.colaC.size() + "\n");
 
-        interfaz.corr.impDurante("Modulo AC  Conexiones Actuales : " + moduloAC.numServOcupados + "/" + moduloAC.numMaxServidores + "  " + tiempoMaximoConexion);
+        interfaz.corr.impDurante("Modulo AC  Conexiones Actuales : " + moduloAC.numServOcupados + "/" + moduloAC.numMaxServidores + " Tiempo max: " + tiempoMaximoConexion);
         interfaz.corr.impDurante("\n\n\n");
-
+    }
+    
+    void imprimirF() {  // Impresiones al final de cada corrida
+        estadisticasT.promediarVidaConexión(listaC);
+        estadisticasT.promediarCola(listaC);
+        interfaz.corr.impReloj("" + String.format("%.2f", reloj) + " seg\n");
+        interfaz.corr.impCD("" + estadisticasT.conexionesDescartadas + "\n");
+        interfaz.corr.impFinal("Corrida numero :"+iter + "\n");
+        interfaz.corr.impFinal("Conexiones Descartadas: "+estadisticasT.conexionesDescartadas + "\n");
+        interfaz.corr.impFinal("Conexiones Totales: "+ids + "\n");
+        interfaz.corr.impFinal("Tamaño Promedio de la cola AP: " + estadisticasT.promedioColaAP + "\n");
+        interfaz.corr.impFinal("Tamaño Promedio de la cola PC: " + estadisticasT.promedioColaPC + "\n");
+        interfaz.corr.impFinal("Tamaño Promedio de la cola T: " + estadisticasT.promedioColaT + "\n");
+        interfaz.corr.impFinal("Tamaño Promedio de la cola ES: " + estadisticasT.promedioColaES + "\n");
+        interfaz.corr.impFinal("\n\n\n");
+    }
+    
+    void imprimirT() {  // Impresiones al final de la serie de corridas
+        estadisticasT.promediarVidaConexión(listaC);
+        estadisticasT.promediarCola(listaC);
+        interfaz.corr.impReloj("" + String.format("%.2f", reloj) + " seg\n");
+        interfaz.corr.impCD("" + estadisticasT.conexionesDescartadas + "\n");
+        interfaz.corr.impFinal("Corrida numero :"+iter);
+        interfaz.corr.impFinal("Conexiones Descartadas: "+estadisticasT.conexionesDescartadas);
+        interfaz.corr.impFinal("Conexiones Totales: "+ids);
+        interfaz.corr.impFinal("Tamaño Promedio de la cola AP: " + estadisticasT.promedioColaAP);
+        interfaz.corr.impFinal("Tamaño Promedio de la cola PC: " + estadisticasT.promedioColaPC);
+        interfaz.corr.impFinal("Tamaño Promedio de la cola T: " + estadisticasT.promedioColaT);
+        interfaz.corr.impFinal("Tamaño Promedio de la cola ES: " + estadisticasT.promedioColaES);
+        interfaz.corr.impFinal("\n\n\n");
     }
 
     public static void main(String[] args) {
-        Simulacion s = new Simulacion();
-        s.Simular();
+        interfaz.run();
+        boolean v3 = false;
+        while (!interfaz.v3) {
+            v3 = interfaz.datos.getV3();
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+            }
+        }
+        int iteraciones = interfaz.iter;
+        while (iter <= iteraciones) {
+            Simulacion s = new Simulacion();
+            s.Simular();
+            iter++;
+        }
     }
 }

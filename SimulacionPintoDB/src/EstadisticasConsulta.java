@@ -1,8 +1,14 @@
 
 public class EstadisticasConsulta {
-
-    double tiempoLlegadaModulo = -1;
-    double tiempoSalidaModulo = -1;
-    double tiempoSalidaCola = -1;
-    double tiempoEnModulo = -1;
+    double tiempoLlegadaModulo;
+    double tiempoSalidaModulo;
+    double tiempoSalidaCola;
+    double tiempoEnModulo;
+    
+    public EstadisticasConsulta(){
+        tiempoLlegadaModulo = -1;
+        tiempoSalidaModulo = -1;
+        tiempoSalidaCola = -1;
+        tiempoEnModulo = -1;
+    }
 }

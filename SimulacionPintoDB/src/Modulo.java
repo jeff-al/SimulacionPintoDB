@@ -9,7 +9,12 @@ public abstract class Modulo {
     GenValoresAleatorios generador = new GenValoresAleatorios();
     int numMaxServidores = 0;
     int numServOcupados = 0;
-    Queue<Consulta> colaC = new LinkedList();
+    Queue<Consulta> colaC;
+    Modulo(){
+        numMaxServidores = 0;
+        numServOcupados = 0;
+        colaC = new LinkedList();
+    }
     
     List<Consulta> Atendidos = new LinkedList();
 

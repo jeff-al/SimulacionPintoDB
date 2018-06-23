@@ -3,18 +3,31 @@ import java.util.*;
 
 public class EstadisticasTotales {
 
-    int conexionesDescartadas = 0;
-    double promedioColaAP = 0;
-    double promedioColaPC = 0;
-    double promedioColaT = 0;
-    double promedioColaES = 0;
+    int conexionesDescartadas;
+    double promedioColaAP;
+    double promedioColaPC;
+    double promedioColaT;
+    double promedioColaES;
 
-    double pasoPorAP = 0;
-    double pasoPorPC = 0;
-    double pasoPorT = 0;
-    double pasoPorES = 0;
+    double pasoPorAP;
+    double pasoPorPC;
+    double pasoPorT;
+    double pasoPorES;
 
     double promedioVidaConexion;
+    
+    public EstadisticasTotales(){
+        conexionesDescartadas = 0;
+        promedioColaAP = 0;
+        promedioColaPC = 0;
+        promedioColaT = 0;
+        promedioColaES = 0;
+
+        pasoPorAP = 0;
+        pasoPorPC = 0;
+        pasoPorT = 0;
+        pasoPorES = 0;
+    }
 
     void promediarCola(List<Consulta> listaC) {
         for (int i = 0; i < listaC.size(); i++) {
