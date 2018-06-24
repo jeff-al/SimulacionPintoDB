@@ -14,7 +14,8 @@ public class AdministracionProcesos extends Modulo {
 
     @Override
     void procesarEntrada(Simulacion s, Evento e) {
-        if (s.moduloAC.numServOcupados < s.moduloAC.numMaxServidores) {   //Si el modulo Administracion de conexiones permite una nueva entrada 
+        if (s.moduloAC.numServOcupados < s.moduloAC.numMaxServidores) {   //Si el modulo Administracion de conexiones permite una nueva entrada
+            s.listaC.add(e.consulta);
             e.consulta.estadistAdm_Procesos.tiempoLlegadaModulo = e.tiempo;
             e.consulta.moduloActual = Evento.TipoModulo.ADM_PROCESOS;
             if (numServOcupados == numMaxServidores) { //Si ya hay una consulta siendo procesada

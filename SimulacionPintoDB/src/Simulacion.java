@@ -1,4 +1,5 @@
 
+import Ventanas.Interfaz;
 import java.util.*;
 
 public class Simulacion extends Thread {
@@ -9,6 +10,7 @@ public class Simulacion extends Thread {
     double tiempoM;
     List<Consulta> listaC;
     List<Evento> listaE;
+    static List<EstadisticasTotales> listaET;
 
     int n;  //ProcesosDisponibles
     int p;  //MaximoConsultas
@@ -71,7 +73,6 @@ public class Simulacion extends Thread {
             }
             Evento evento = buscarMenor(listaE);
             reloj = evento.tiempo;
-            //System.out.println("Reloj: " + reloj + " ID: " + evento.consulta.id + " Sentencia: " + evento.consulta.tipoSentencia + " Modulo: " + evento.modulo + " Evento: " + evento.tipoE);
             if (evento.consulta.enSistema) {
                 if (evento.tipoE == Evento.TipoEvento.RETIRO) {
                     switch (evento.consulta.moduloActual) {
@@ -95,7 +96,6 @@ public class Simulacion extends Thread {
                     interfaz.corr.impDurante("SALIO: " + evento.consulta.id + "  -------  " + "Mod Actual: " + evento.consulta.moduloActual + "Tipo: "+evento.consulta.tipoSentencia+"  " );
                 } else {
                     interfaz.corr.impDurante("ID Consulta: " + evento.consulta.id + "  -------  Tipo de Sentencia: " + evento.consulta.tipoSentencia + "  -------  Modulo: " + evento.modulo + "  -------  Evento: " + evento.tipoE + "\n");
-                    //System.out.println("Reloj: " + reloj + " ID: " + evento.consulta.id + " Sentencia: " + evento.consulta.tipoSentencia + " Modulo: " + evento.modulo + " Evento: " + evento.tipoE);
                     switch (evento.modulo) {
                         case ADM_CONEXIONES:
                             if (evento.tipoE == Evento.TipoEvento.ENTRADA) {
@@ -139,17 +139,7 @@ public class Simulacion extends Thread {
             }
         }
         imprimirF();
-        /*
-        estadisticasT.promediarVidaConexión(listaC);
-        estadisticasT.promediarCola(listaC);
-        System.out.println("Descartadas: " + estadisticasT.conexionesDescartadas);
-        System.out.println("Totales: " + ids);
-        System.out.println("Tamaño Promedio de la cola AP: " + estadisticasT.promedioColaAP);
-        System.out.println("Tamaño Promedio de la cola PC: " + estadisticasT.promedioColaPC);
-        System.out.println("Tamaño Promedio de la cola T: " + estadisticasT.promedioColaT);
-        System.out.println("Tamaño Promedio de la cola ES: " + estadisticasT.promedioColaES);
-        */
-        
+        //listaET.add(estadisticasT);
     }
 
     void crearEvento() {
@@ -187,7 +177,7 @@ public class Simulacion extends Thread {
         
         listaE.add(evento);                    //Se añaden los eventos a la lista de eventos
         listaE.add(eventoTO);
-        listaC.add(consulta);                  //Se añade la consulta generada a la lista de consultas
+        //listaC.add(consulta);                  //Se añade la consulta generada a la lista de consultas
     }
 
     Evento buscarMenor(List<Evento> lista) { 
@@ -210,43 +200,68 @@ public class Simulacion extends Thread {
         interfaz.corr.impReloj("" + String.format("%.2f", reloj) + " seg\n");
         interfaz.corr.impCD("" + estadisticasT.conexionesDescartadas + "\n");
         interfaz.corr.impDurante("Reloj: " + String.format("%.2f", reloj) + " seg\n");
-        interfaz.corr.impDurante("Modulo AP  Serv Ocupados : " + moduloAP.numServOcupados + "/" + moduloAP.numMaxServidores);
+        interfaz.corr.impDurante("Modulo Administracion de Procesos Serv Ocupados : " + moduloAP.numServOcupados + "/" + moduloAP.numMaxServidores);
         interfaz.corr.impDurante("   Cola en modulo: " + moduloAP.colaC.size() + "\n");
 
-        interfaz.corr.impDurante("Modulo PC  Serv Ocupados : " + moduloPC.numServOcupados + "/" + moduloPC.numMaxServidores);
+        interfaz.corr.impDurante("Modulo Procesamiento de Consultas Serv Ocupados : " + moduloPC.numServOcupados + "/" + moduloPC.numMaxServidores);
         interfaz.corr.impDurante("   Cola en modulo: " + moduloPC.colaC.size() + "\n");
 
-        interfaz.corr.impDurante("Modulo TR  Serv Ocupados : " + moduloT.numServOcupados + "/" + moduloT.numMaxServidores);
+        interfaz.corr.impDurante("Modulo Transacciones Serv Ocupados : " + moduloT.numServOcupados + "/" + moduloT.numMaxServidores);
         interfaz.corr.impDurante("   Cola en modulo: " + moduloT.Colasize() + "\n");
 
-        interfaz.corr.impDurante("Modulo ES  Serv Ocupados : " + moduloES.numServOcupados + "/" + moduloES.numMaxServidores);
+        interfaz.corr.impDurante("Modulo Ejecucion de Sentencias Serv Ocupados : " + moduloES.numServOcupados + "/" + moduloES.numMaxServidores);
         interfaz.corr.impDurante("   Cola en modulo: " + moduloES.colaC.size() + "\n");
 
-        interfaz.corr.impDurante("Modulo AC  Conexiones Actuales : " + moduloAC.numServOcupados + "/" + moduloAC.numMaxServidores + " Tiempo max: " + tiempoMaximoConexion);
+        interfaz.corr.impDurante("Modulo Administracion de Conexiones Conexiones Actuales : " + moduloAC.numServOcupados + "/" + moduloAC.numMaxServidores + " Tiempo max: " + tiempoMaximoConexion);
         interfaz.corr.impDurante("\n\n\n");
     }
     
     void imprimirF() {  // Impresiones al final de cada corrida
         estadisticasT.promediarVidaConexión(listaC);
         estadisticasT.promediarCola(listaC);
+        estadisticasT.promediarTSxMod(listaC);
         interfaz.corr.impReloj("" + String.format("%.2f", reloj) + " seg\n");
         interfaz.corr.impCD("" + estadisticasT.conexionesDescartadas + "\n");
         interfaz.corr.impFinal("Corrida numero :"+iter + "\n");
         interfaz.corr.impFinal("Conexiones Descartadas: "+estadisticasT.conexionesDescartadas + "\n");
         interfaz.corr.impFinal("Conexiones Totales: "+ids + "\n");
-        interfaz.corr.impFinal("Tamaño Promedio de la cola AP: " + estadisticasT.promedioColaAP + "\n");
-        interfaz.corr.impFinal("Tamaño Promedio de la cola PC: " + estadisticasT.promedioColaPC + "\n");
-        interfaz.corr.impFinal("Tamaño Promedio de la cola T: " + estadisticasT.promedioColaT + "\n");
-        interfaz.corr.impFinal("Tamaño Promedio de la cola ES: " + estadisticasT.promedioColaES + "\n");
+        interfaz.corr.impFinal("Tiempo promedio de vida por conexion: "+ estadisticasT.promedioVidaConexion +" segundos \n");
+        interfaz.corr.impFinal("Tamaño Promedio de la cola modulo Administracion de Procesos: " + estadisticasT.promedioColaAP + "\n");
+        interfaz.corr.impFinal("Tamaño Promedio de la cola modulo Procesamiento de Consultas: " + estadisticasT.promedioColaPC + "\n");
+        interfaz.corr.impFinal("Tamaño Promedio de la cola modulo Transacciones: " + estadisticasT.promedioColaT + "\n");
+        interfaz.corr.impFinal("Tamaño Promedio de la cola modulo Ejecucion de Sentencias: " + estadisticasT.promedioColaES + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Administracion de Procesos: "+estadisticasT.promediosDDL[0]+"\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Procesamiento de Consultas: "+estadisticasT.promediosDDL[1]+"\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Transacciones: "+estadisticasT.promediosDDL[2]+"\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Ejecucion de Sentencias: "+estadisticasT.promediosDDL[3]+"\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Administracion de Conexiones: "+estadisticasT.promediosDDL[4]+"\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Administracion de Procesos: "+estadisticasT.promediosUpdate[0]+"\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Procesamiento de Consultas: "+estadisticasT.promediosUpdate[1]+"\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Transacciones: "+estadisticasT.promediosUpdate[2]+"\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Ejecucion de Sentencias: "+estadisticasT.promediosUpdate[3]+"\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Administracion de Conexiones: "+estadisticasT.promediosUpdate[4]+"\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Administracion de Procesos: "+estadisticasT.promediosJoin[0]+"\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Procesamiento de Consultas: "+estadisticasT.promediosJoin[1]+"\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Transacciones: "+estadisticasT.promediosJoin[2]+"\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Ejecucion de Sentencias: "+estadisticasT.promediosJoin[3]+"\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Administracion de Conexiones: "+estadisticasT.promediosJoin[4]+"\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Administracion de Procesos: "+estadisticasT.promediosSelect[0]+"\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Procesamiento de Consultas: "+estadisticasT.promediosSelect[1]+"\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Transacciones: "+estadisticasT.promediosSelect[2]+"\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Ejecucion de Sentencias: "+estadisticasT.promediosSelect[3]+"\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Administracion de Conexiones: "+estadisticasT.promediosSelect[4]+"\n");
         interfaz.corr.impFinal("\n\n\n");
     }
     
-    void imprimirT() {  // Impresiones al final de la serie de corridas
-        estadisticasT.promediarVidaConexión(listaC);
-        estadisticasT.promediarCola(listaC);
-        interfaz.corr.impReloj("" + String.format("%.2f", reloj) + " seg\n");
-        interfaz.corr.impCD("" + estadisticasT.conexionesDescartadas + "\n");
-        interfaz.corr.impFinal("Corrida numero :"+iter);
+    static void imprimirT() {  // Impresiones al final de la serie de corridas
+        /*
+        interfaz.corr.impFinal("Estadisticas Totales de toda la serie de corridas \n\n");
+        for (int i = 0; i < listaET.size(); i++) {
+            EstadisticasTotales it = listaET.get(i);
+            for(int j = 0; j<5; j++){
+                
+            }
+        }
         interfaz.corr.impFinal("Conexiones Descartadas: "+estadisticasT.conexionesDescartadas);
         interfaz.corr.impFinal("Conexiones Totales: "+ids);
         interfaz.corr.impFinal("Tamaño Promedio de la cola AP: " + estadisticasT.promedioColaAP);
@@ -254,6 +269,7 @@ public class Simulacion extends Thread {
         interfaz.corr.impFinal("Tamaño Promedio de la cola T: " + estadisticasT.promedioColaT);
         interfaz.corr.impFinal("Tamaño Promedio de la cola ES: " + estadisticasT.promedioColaES);
         interfaz.corr.impFinal("\n\n\n");
+*/
     }
 
     public static void main(String[] args) {
@@ -272,5 +288,6 @@ public class Simulacion extends Thread {
             s.Simular();
             iter++;
         }
+        imprimirT();
     }
 }
