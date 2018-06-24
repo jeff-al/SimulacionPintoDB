@@ -311,7 +311,6 @@ public class Simulacion extends Thread {
         interfaz.corr.impReloj("");
         interfaz.corr.impCD("");
         interfaz.corr.impFinal("Estadisticas Totales de toda la serie de corridas \n\n");
-        interfaz.corr.impFinal("Estadisticas Totales de toda la serie de corridas \n\n");
         interfaz.corr.impFinal("Tiempo promedio de vida por conexion: " + promVxC + " segundos \n");
         interfaz.corr.impFinal("Conexiones Descartadas: " + conD + "\n");
         interfaz.corr.impFinal("Tamaño Promedio de la cola modulo Administracion de Procesos: " + promedioColaAP + "\n");

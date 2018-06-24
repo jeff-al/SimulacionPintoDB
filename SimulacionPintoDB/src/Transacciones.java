@@ -6,7 +6,7 @@ import java.util.Iterator;
 public class Transacciones extends Modulo {
 
     static class PQsort implements Comparator<Consulta> {       //Implementado para hacer que se inserten en la cola segun la prioridad establecida en el proyecto
-
+        
         @Override
         public int compare(Consulta one, Consulta two) {      //Compara 2 consultas
             int val1 = 0;
@@ -45,10 +45,12 @@ public class Transacciones extends Modulo {
 
     Transacciones(int numConsultasMaximas) {
         numMaxServidores = numConsultasMaximas;
+        espera = false;
+        PQ = new PriorityQueue(new PQsort());
     }
 
-    boolean espera = false;                 //Booleano para determinar si un DDL está siendo atendido o está en cola
-    PriorityQueue<Consulta> PQ = new PriorityQueue(new PQsort());   //Cola de prioridad del modulo de transacciones
+    boolean espera;                 //Booleano para determinar si un DDL está siendo atendido o está en cola
+    PriorityQueue<Consulta> PQ;   //Cola de prioridad del modulo de transacciones
     double tiempoTotalProcesamiento;
 
     @Override
@@ -135,7 +137,9 @@ public class Transacciones extends Modulo {
                         eventoS.modulo = Evento.TipoModulo.TRANSACCIONES;
                         procesarConsulta(consulta);
                         eventoS.tiempo = e.tiempo + tiempoTotalProcesamiento;
+                        s.listaE.add(eventoS);
                         numServOcupados++;
+                        
                     }
                 } else {                                      //Si el que sale no es un DDL
                     consulta = PQ.remove();
@@ -145,6 +149,7 @@ public class Transacciones extends Modulo {
                     eventoS.modulo = Evento.TipoModulo.TRANSACCIONES;
                     procesarConsulta(consulta);
                     eventoS.tiempo = e.tiempo + tiempoTotalProcesamiento;
+                    s.listaE.add(eventoS);
                 }
             }
         } else {     //Si no hay ninguna consulta en cola
