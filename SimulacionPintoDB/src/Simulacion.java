@@ -107,7 +107,7 @@ public class Simulacion extends Thread {
                             r_ES++; // Analisis Estadistico
                             break;
                     }
-                    interfaz.corr.impDurante("SALIO: " + evento.consulta.id + "  -------  " + "Mod Actual: " + evento.consulta.moduloActual + "Tipo: " + evento.consulta.tipoSentencia + "  ");
+                    interfaz.corr.impDurante("SALIO: " + evento.consulta.id + "  -------  " + "Mod Actual: " + evento.consulta.moduloActual + "Tipo: " + evento.consulta.tipoSentencia + "  \n");
                 } else {
                     interfaz.corr.impDurante("ID Consulta: " + evento.consulta.id + "  -------  Tipo de Sentencia: " + evento.consulta.tipoSentencia + "  -------  Modulo: " + evento.modulo + "  -------  Evento: " + evento.tipoE + "\n");
                     switch (evento.modulo) {
@@ -226,7 +226,7 @@ public class Simulacion extends Thread {
         interfaz.corr.impDurante("Modulo Ejecucion de Sentencias Serv Ocupados : " + moduloES.numServOcupados + "/" + moduloES.numMaxServidores);
         interfaz.corr.impDurante("   Cola en modulo: " + moduloES.colaC.size() + "\n");
 
-        interfaz.corr.impDurante("Modulo Administracion de Conexiones Conexiones Actuales : " + moduloAC.numServOcupados + "/" + moduloAC.numMaxServidores + " Tiempo max: " + tiempoMaximoConexion);
+        interfaz.corr.impDurante("Modulo Administracion de Conexiones Conexiones Actuales : " + moduloAC.numServOcupados + "/" + moduloAC.numMaxServidores+"\n");
         interfaz.corr.impDurante("\n\n\n");
     }
 
@@ -239,31 +239,31 @@ public class Simulacion extends Thread {
         interfaz.corr.impFinal("Corrida numero :" + iter + "\n");
         interfaz.corr.impFinal("Conexiones Descartadas: " + estadisticasT.conexionesDescartadas + "\n");
         interfaz.corr.impFinal("Conexiones Totales: " + ids + "\n");
-        interfaz.corr.impFinal("Tiempo promedio de vida por conexion: " + estadisticasT.promedioVidaConexion + " segundos \n");
+        interfaz.corr.impFinal("Tiempo promedio de vida por conexion: " + String.format("%.2f", estadisticasT.promedioVidaConexion) + " segundos \n");
         interfaz.corr.impFinal("Tamaño Promedio de la cola modulo Administracion de Procesos: " + estadisticasT.promedioColaAP + "\n");
         interfaz.corr.impFinal("Tamaño Promedio de la cola modulo Procesamiento de Consultas: " + estadisticasT.promedioColaPC + "\n");
         interfaz.corr.impFinal("Tamaño Promedio de la cola modulo Transacciones: " + estadisticasT.promedioColaT + "\n");
         interfaz.corr.impFinal("Tamaño Promedio de la cola modulo Ejecucion de Sentencias: " + estadisticasT.promedioColaES + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Administracion de Procesos: " + estadisticasT.promediosDDL[0] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Procesamiento de Consultas: " + estadisticasT.promediosDDL[1] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Transacciones: " + estadisticasT.promediosDDL[2] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Ejecucion de Sentencias: " + estadisticasT.promediosDDL[3] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Administracion de Conexiones: " + estadisticasT.promediosDDL[4] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Administracion de Procesos: " + estadisticasT.promediosUpdate[0] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Procesamiento de Consultas: " + estadisticasT.promediosUpdate[1] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Transacciones: " + estadisticasT.promediosUpdate[2] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Ejecucion de Sentencias: " + estadisticasT.promediosUpdate[3] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Administracion de Conexiones: " + estadisticasT.promediosUpdate[4] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Administracion de Procesos: " + estadisticasT.promediosJoin[0] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Procesamiento de Consultas: " + estadisticasT.promediosJoin[1] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Transacciones: " + estadisticasT.promediosJoin[2] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Ejecucion de Sentencias: " + estadisticasT.promediosJoin[3] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Administracion de Conexiones: " + estadisticasT.promediosJoin[4] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Administracion de Procesos: " + estadisticasT.promediosSelect[0] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Procesamiento de Consultas: " + estadisticasT.promediosSelect[1] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Transacciones: " + estadisticasT.promediosSelect[2] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Ejecucion de Sentencias: " + estadisticasT.promediosSelect[3] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Administracion de Conexiones: " + estadisticasT.promediosSelect[4] + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Administracion de Procesos: " + String.format("%.2f", estadisticasT.promediosDDL[0]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Procesamiento de Consultas: " + String.format("%.2f", estadisticasT.promediosDDL[1]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Transacciones: " + String.format("%.2f", estadisticasT.promediosDDL[2]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Ejecucion de Sentencias: " + String.format("%.2f", estadisticasT.promediosDDL[3]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Administracion de Conexiones: " + String.format("%.2f", estadisticasT.promediosDDL[4]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Administracion de Procesos: " + String.format("%.2f", estadisticasT.promediosUpdate[0]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Procesamiento de Consultas: " + String.format("%.2f", estadisticasT.promediosUpdate[1]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Transacciones: " + String.format("%.2f", estadisticasT.promediosUpdate[2]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Ejecucion de Sentencias: " + String.format("%.2f", estadisticasT.promediosUpdate[3]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Administracion de Conexiones: " + String.format("%.2f", estadisticasT.promediosUpdate[4]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Administracion de Procesos: " + String.format("%.2f", estadisticasT.promediosJoin[0]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Procesamiento de Consultas: " + String.format("%.2f", estadisticasT.promediosJoin[1]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Transacciones: " + String.format("%.2f", estadisticasT.promediosJoin[2]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Ejecucion de Sentencias: " + String.format("%.2f", estadisticasT.promediosJoin[3]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Administracion de Conexiones: " + String.format("%.2f", estadisticasT.promediosJoin[4]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Administracion de Procesos: " + String.format("%.2f", estadisticasT.promediosSelect[0]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Procesamiento de Consultas: " + String.format("%.2f", estadisticasT.promediosSelect[1]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Transacciones: " + String.format("%.2f", estadisticasT.promediosSelect[2]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Ejecucion de Sentencias: " + String.format("%.2f", estadisticasT.promediosSelect[3]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Administracion de Conexiones: " + String.format("%.2f", estadisticasT.promediosSelect[4]) + "\n");
         interfaz.corr.impFinal("Retiros del modulo AP: "+r_AP+"\n");
         interfaz.corr.impFinal("Retiros del modulo PC: "+r_PC+"\n");
         interfaz.corr.impFinal("Retiros del modulo T: "+r_T+"\n");
@@ -311,32 +311,32 @@ public class Simulacion extends Thread {
         interfaz.corr.impReloj("");
         interfaz.corr.impCD("");
         interfaz.corr.impFinal("Estadisticas Totales de toda la serie de corridas \n\n");
-        interfaz.corr.impFinal("Tiempo promedio de vida por conexion: " + promVxC + " segundos \n");
+        interfaz.corr.impFinal("Tiempo promedio de vida por conexion: " + String.format("%.2f", promVxC) + " segundos \n");
         interfaz.corr.impFinal("Conexiones Descartadas: " + conD + "\n");
         interfaz.corr.impFinal("Tamaño Promedio de la cola modulo Administracion de Procesos: " + promedioColaAP + "\n");
         interfaz.corr.impFinal("Tamaño Promedio de la cola modulo Procesamiento de Consultas: " + promedioColaPC + "\n");
         interfaz.corr.impFinal("Tamaño Promedio de la cola modulo Transacciones: " + promedioColaT + "\n");
         interfaz.corr.impFinal("Tamaño Promedio de la cola modulo Ejecucion de Sentencias: " + promedioColaES + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Administracion de Procesos: " + promediosDDL[0] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Procesamiento de Consultas: " + promediosDDL[1] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Transacciones: " + promediosDDL[2] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Ejecucion de Sentencias: " + promediosDDL[3] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Administracion de Conexiones: " + promediosDDL[4] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Administracion de Procesos: " + promediosUpdate[0] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Procesamiento de Consultas: " + promediosUpdate[1] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Transacciones: " + promediosUpdate[2] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Ejecucion de Sentencias: " + promediosUpdate[3] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Administracion de Conexiones: " + promediosUpdate[4] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Administracion de Procesos: " + promediosJoin[0] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Procesamiento de Consultas: " + promediosJoin[1] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Transacciones: " + promediosJoin[2] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Ejecucion de Sentencias: " + promediosJoin[3] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Administracion de Conexiones: " + promediosJoin[4] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Administracion de Procesos: " + promediosSelect[0] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Procesamiento de Consultas: " + promediosSelect[1] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Transacciones: " + promediosSelect[2] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Ejecucion de Sentencias: " + promediosSelect[3] + "\n");
-        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Administracion de Conexiones: " + promediosSelect[4] + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Administracion de Procesos: " + String.format("%.2f", promediosDDL[0]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Procesamiento de Consultas: " + String.format("%.2f", promediosDDL[1]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Transacciones: " + String.format("%.2f", promediosDDL[2]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Ejecucion de Sentencias: " + String.format("%.2f", promediosDDL[3]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia DDL en el modulo Administracion de Conexiones: " + String.format("%.2f", promediosDDL[4]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Administracion de Procesos: " + String.format("%.2f", promediosUpdate[0]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Procesamiento de Consultas: " + String.format("%.2f", promediosUpdate[1]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Transacciones: " + String.format("%.2f", promediosUpdate[2]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Ejecucion de Sentencias: " + String.format("%.2f", promediosUpdate[3]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia UPDATE en el modulo Administracion de Conexiones: " + String.format("%.2f", promediosUpdate[4]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Administracion de Procesos: " + String.format("%.2f", promediosJoin[0]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Procesamiento de Consultas: " + String.format("%.2f", promediosJoin[1]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Transacciones: " + String.format("%.2f", promediosJoin[2]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Ejecucion de Sentencias: " + String.format("%.2f", promediosJoin[3]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia JOIN en el modulo Administracion de Conexiones: " + String.format("%.2f", promediosJoin[4]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Administracion de Procesos: " + String.format("%.2f", promediosSelect[0]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Procesamiento de Consultas: " + String.format("%.2f", promediosSelect[1]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Transacciones: " + String.format("%.2f", promediosSelect[2]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Ejecucion de Sentencias: " + String.format("%.2f", promediosSelect[3]) + "\n");
+        interfaz.corr.impFinal("Promedio de vida de la Sentencia SELECT en el modulo Administracion de Conexiones: " + String.format("%.2f", promediosSelect[4]) + "\n");
     }
 
     public static void main(String[] args) {

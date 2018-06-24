@@ -87,13 +87,15 @@ public class EstadisticasTotales {
 
     void promediarVidaConexión(List<Consulta> listaC) {
         double promedio = 0;
+        int x = 0;
         for (int i = 0; i < listaC.size(); i++) {
-            if (-1 < listaC.get(i).tiempoSalida) {
+            if (listaC.get(i).tiempoLlegada <= listaC.get(i).tiempoSalida) {
                 listaC.get(i).tiempoEnsistema = listaC.get(i).tiempoSalida - listaC.get(i).tiempoLlegada;
                 promedio += listaC.get(i).tiempoEnsistema;
+                x++;
             }
         }
-        promedio /= listaC.size();
+        promedio = promedio / x;
         promedioVidaConexion = promedio;
     }
 
