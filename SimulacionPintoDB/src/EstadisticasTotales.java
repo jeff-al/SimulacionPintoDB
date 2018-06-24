@@ -13,7 +13,7 @@ public class EstadisticasTotales {
     double pasoPorPC;
     double pasoPorT;
     double pasoPorES;
-    
+
     // arrays para determinar el tiempo promedio de tipo de sentencia por modulo
     // con 0 = moduloAP
     // con 1 = moduloPC
@@ -98,7 +98,7 @@ public class EstadisticasTotales {
     void promediarTSxMod(List<Consulta> listaC) { // Promediar tipo de sentencia por modulo
         for (int i = 0; i < listaC.size(); i++) {
             Consulta it = listaC.get(i);
-            if (it.estadistAdm_Procesos.tiempoSalidaModulo > -1) {
+            if (it.estadistAdm_Procesos.tiempoEnModulo > -1) {
                 if (it.tipoSentencia == Consulta.TipoSentencia.DDL) {
                     pasaPorDDL[0]++;
                     promediosDDL[0] += it.estadistAdm_Procesos.tiempoEnModulo;
@@ -113,7 +113,7 @@ public class EstadisticasTotales {
                     promediosSelect[0] += it.estadistAdm_Procesos.tiempoEnModulo;
                 }
             }
-            if (it.estadistProc_Consultas.tiempoSalidaModulo > -1) {
+            if (it.estadistProc_Consultas.tiempoEnModulo > -1) {
                 if (it.tipoSentencia == Consulta.TipoSentencia.DDL) {
                     pasaPorDDL[1]++;
                     promediosDDL[1] += it.estadistProc_Consultas.tiempoEnModulo;
@@ -128,7 +128,7 @@ public class EstadisticasTotales {
                     promediosSelect[1] += it.estadistProc_Consultas.tiempoEnModulo;
                 }
             }
-            if (it.estadistTransacciones.tiempoSalidaModulo > -1) {
+            if (it.estadistTransacciones.tiempoEnModulo > -1) {
                 if (it.tipoSentencia == Consulta.TipoSentencia.DDL) {
                     pasaPorDDL[2]++;
                     promediosDDL[2] += it.estadistTransacciones.tiempoEnModulo;
@@ -143,7 +143,7 @@ public class EstadisticasTotales {
                     promediosSelect[2] += it.estadistTransacciones.tiempoEnModulo;
                 }
             }
-            if (it.estadistEjec_Sentencias.tiempoSalidaModulo > -1) {
+            if (it.estadistEjec_Sentencias.tiempoEnModulo > -1) {
                 if (it.tipoSentencia == Consulta.TipoSentencia.DDL) {
                     pasaPorDDL[3]++;
                     promediosDDL[3] += it.estadistEjec_Sentencias.tiempoEnModulo;
@@ -158,7 +158,7 @@ public class EstadisticasTotales {
                     promediosSelect[3] += it.estadistEjec_Sentencias.tiempoEnModulo;
                 }
             }
-            if (it.estadistAdm_Conexiones.tiempoSalidaModulo > -1) {
+            if (it.estadistAdm_Conexiones.tiempoEnModulo > -1) {
                 if (it.tipoSentencia == Consulta.TipoSentencia.DDL) {
                     pasaPorDDL[4]++;
                     promediosDDL[4] += it.estadistAdm_Conexiones.tiempoEnModulo;
@@ -175,10 +175,18 @@ public class EstadisticasTotales {
             }
         }
         for (int i = 0; i < 5; i++) {
-            promediosDDL[i] = Math.round(promediosDDL[i] / pasaPorDDL[i]);
-            promediosUpdate[i] = Math.round(promediosUpdate[i] / pasaPorUpdate[i]);
-            promediosSelect[i] = Math.round(promediosSelect[i] / pasaPorSelect[i]);
-            promediosJoin[i] = Math.round(promediosJoin[i] / pasaPorJoin[i]);
+            if (promediosDDL[i] != 0) {
+                promediosDDL[i] = promediosDDL[i] / pasaPorDDL[i];
+            }
+            if (promediosUpdate[i] != 0) {
+                promediosUpdate[i] = promediosUpdate[i] / pasaPorUpdate[i];
+            }
+            if (promediosSelect[i] != 0) {
+                promediosSelect[i] = promediosSelect[i] / pasaPorSelect[i];
+            }
+            if (promediosJoin[i] != 0) {
+                promediosJoin[i] = promediosJoin[i] / pasaPorJoin[i];
+            }
         }
     }
 }

@@ -29,25 +29,6 @@ public abstract class Modulo {
     void procesarRetiro(Simulacion s, Evento e) {
       
     }
-
-    void imprimirCola() {
-        Iterator<Consulta> it = colaC.iterator();
-        System.out.print("C: ");
-        while (it.hasNext()) {
-            Consulta c = it.next();
-            System.out.print(c.id + ", ");
-        }
-        System.out.print("\n");
-    }
-    
-    void imprimirAtend() {
-        Iterator<Consulta> it = Atendidos.iterator();
-        System.out.print("Atendidos: ");
-        while (it.hasNext()) {
-            Consulta c = it.next();
-            System.out.print(c.id + ", ");
-        }
-    }
     
     int Colasize() {
         return 0;

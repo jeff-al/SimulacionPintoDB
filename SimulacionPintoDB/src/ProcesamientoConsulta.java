@@ -1,4 +1,5 @@
 
+
 import java.util.Iterator;
 
 public class ProcesamientoConsulta extends Modulo {
@@ -79,7 +80,6 @@ public class ProcesamientoConsulta extends Modulo {
             procesamiento(consulta);                               //Se procesa la consulta 
             eventoS.tiempo = e.tiempo + tiempoProcesamiento;
             s.listaE.add(eventoS);
-            numServOcupados++;
         } else if (!enCola) {                         //Si estaba siendo atendido y no habia nadie en cola
             numServOcupados--;
         }

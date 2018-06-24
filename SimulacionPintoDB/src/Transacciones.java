@@ -153,17 +153,6 @@ public class Transacciones extends Modulo {
     }
 
     @Override
-    void imprimirCola() {
-        Iterator<Consulta> it = PQ.iterator();
-        System.out.print("C: ");
-        while (it.hasNext()) {
-            Consulta c = it.next();
-            System.out.print(c.id + ", ");
-        }
-        System.out.print("\n");
-    }
-
-    @Override
     void procesarRetiro(Simulacion s, Evento e) {
         boolean enCola = false;                       //Booleano para saber si está en cola
         Iterator<Consulta> it = PQ.iterator();
